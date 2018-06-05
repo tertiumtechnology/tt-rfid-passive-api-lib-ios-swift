@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 import Foundation
+import TxRxLib
 
 /// Represents the RFID/NFC tag reader
 class PassiveReader: TxRxDeviceDataProtocol {
