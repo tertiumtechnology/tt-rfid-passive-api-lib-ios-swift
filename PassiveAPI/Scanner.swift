@@ -26,18 +26,18 @@ import TxRxLib
 
 /// Performs the scanning of Tertium Ble Devices
 public class Scanner: TxRxDeviceScanProtocol {
-    class Timeouts {
-        static let S_TERTIUM_TIMEOUT_CONNECT = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT
-        static let S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET = TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET
-        static let S_TERTIUM_TIMEOUT_RECEIVE_PACKETS = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS
-        static let S_TERTIUM_TIMEOUT_SEND_PACKET = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET
+    public class Timeouts {
+        public static let S_TERTIUM_TIMEOUT_CONNECT = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT
+        public static let S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET = TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET
+        public static let S_TERTIUM_TIMEOUT_RECEIVE_PACKETS = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS
+        public static let S_TERTIUM_TIMEOUT_SEND_PACKET = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET
     }
     
     /// Scanner singleton
     private static let instance: Scanner = Scanner()
     
     /// Class delegate
-    var delegate: AbstractScanListenerProtocol? = nil
+    public var delegate: AbstractScanListenerProtocol? = nil
 
     /// TxRxManager instance
     private let deviceManager: TxRxManager = TxRxManager.getInstance()
