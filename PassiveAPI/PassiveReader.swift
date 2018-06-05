@@ -315,7 +315,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     /// UHF reader device RF carrier frequency 925.25MHz (no frequency hopping)
     static let RF_CARRIER_925_25_MHZ:Int = 0x10
 	
-    static func getInstance() -> PassiveReader {
+    public static func getInstance() -> PassiveReader {
         return PassiveReader._sharedInstance
     }
     
