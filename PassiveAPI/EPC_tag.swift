@@ -25,67 +25,67 @@ import Foundation
 
 public class EPC_tag: Tag {    
     /// EPC tag reserved memory bank.
-    static let RESERVED_MEMORY_BANK: Int = 0x00
+    public static let RESERVED_MEMORY_BANK: Int = 0x00
     
     /// EPC tag kill password reserved memory address.
-    static let KILL_PASSWORD_ADDRESS: Int = 0x00
+    public static let KILL_PASSWORD_ADDRESS: Int = 0x00
     
     /// EPC tag access password reserved memory address.
-    static let ACCESS_PASSWORD_ADDRESS: Int = 0x02
+    public static let ACCESS_PASSWORD_ADDRESS: Int = 0x02
     
     /// EPC tag ID memory bank.
-    static let EPC_MEMORY_BANK: Int = 0x01
+    public static let EPC_MEMORY_BANK: Int = 0x01
     
     /// EPC tag TID memory bank.
-    static let TID_MEMORY_BANK: Int = 0x02
+    public static let TID_MEMORY_BANK: Int = 0x02
     
     /// EPC tag user memory memory bank.
-    static let USER_MEMORY_BANK: Int = 0x03
+    public static let USER_MEMORY_BANK: Int = 0x03
     
     /// EPC tag ID writable and not lockable lock code.
-    static let ID_WRITABLE_NOTLOCKABLE: Int = 0x0C010F
+    public static let ID_WRITABLE_NOTLOCKABLE: Int = 0x0C010F
     
     /// EPC tag TID writable and not lockable lock code.
-    static let TID_WRITABLE_NOTLOCKABLE: Int = 0x03004F
+    public static let TID_WRITABLE_NOTLOCKABLE: Int = 0x03004F
     
     /// EPC tag user memory writable and not lockable lock code.
-    static let MEMORY_WRITABLE_NOTLOCKABLE: Int = 0x00C01F
+    public static let MEMORY_WRITABLE_NOTLOCKABLE: Int = 0x00C01F
     
     /// EPC tag ID password writable lock code.
-    static let ID_PASSWORD_WRITABLE: Int = 0x0C020F
+    public static let ID_PASSWORD_WRITABLE: Int = 0x0C020F
     
     /// EPC tag TID password writable lock code.
-    static let TID_PASSWORD_WRITABLE: Int = 0x03008F
+    public static let TID_PASSWORD_WRITABLE: Int = 0x03008F
     
     /// EPC tag user memory password writable lock code.
-    static let MEMORY_PASSWORD_WRITABLE: Int = 0x00C02F
+    public static let MEMORY_PASSWORD_WRITABLE: Int = 0x00C02F
     
     /// EPC tag ID unwritable lock code.
-    static let ID_NOTWRITABLE: Int = 0x0C0C0F
+    public static let ID_NOTWRITABLE: Int = 0x0C0C0F
     
     /// EPC tag TID unwritable lock code.
-    static let TID_NOTWRITABLE: Int = 0x0300CF
+    public static let TID_NOTWRITABLE: Int = 0x0300CF
     
     /// EPC tag user memory unwritable lock code.
-    static let MEMORY_NOTWRITABLE: Int = 0x00C03F
+    public static let MEMORY_NOTWRITABLE: Int = 0x00C03F
     
     /// EPC tag kill password readable/writable and not lockable lock code.
-    static let KILLPASSWORD_READABLE_WRITABLE_NOTLOCKABLE: Int = 0xC0100F
+    public static let KILLPASSWORD_READABLE_WRITABLE_NOTLOCKABLE: Int = 0xC0100F
     
     /// EPC tag access password readable/writable and not lockable lock code.
-    static let ACCESSPASSWORD_READABLE_WRITABLE_NOTLOCKABLE: Int = 0x30040F
+    public static let ACCESSPASSWORD_READABLE_WRITABLE_NOTLOCKABLE: Int = 0x30040F
     
     /// EPC tag kill password password readable/writable lock code.
-    static let KILLPASSWORD_PASSWORD_READABLE_WRITABLE: Int = 0xC0200F
+    public static let KILLPASSWORD_PASSWORD_READABLE_WRITABLE: Int = 0xC0200F
     
     /// EPC tag access password password readable/writable lock code.
-    static let ACCESSPASSWORD_PASSWORD_READABLE_WRITABLE: Int = 0x30080F
+    public static let ACCESSPASSWORD_PASSWORD_READABLE_WRITABLE: Int = 0x30080F
     
     /// EPC tag kill password unreadable/unwritable lock code.
-    static let KILLPASSWORD_UNREADABLE_UNWRITABLE: Int = 0xC0300F
+    public static let KILLPASSWORD_UNREADABLE_UNWRITABLE: Int = 0xC0300F
  
     /// EPC tag access password unreadable/unwritable lock code.
-    static let ACCESSPASSWORD_UNREADABLE_UNWRITABLE: Int = 0x300C0F	
+    public static let ACCESSPASSWORD_UNREADABLE_UNWRITABLE: Int = 0x300C0F	
 	
     private let PC: UInt16
 	
