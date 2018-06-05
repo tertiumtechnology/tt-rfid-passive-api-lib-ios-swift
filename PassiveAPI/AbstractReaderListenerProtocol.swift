@@ -28,7 +28,7 @@
 /// A concrete instance of {@code AbstractReaderListenerProtocol} has to set for the
 /// instance of the class {@code PassiveReader} to receive notification about
 /// methods invocation.
-protocol AbstractReaderListenerProtocol {
+public protocol AbstractReaderListenerProtocol {
     /// Invoked after a {@link PassiveReader#connect(String, android.content.Context)} method invocation
     /// to notify failure.
     /// 

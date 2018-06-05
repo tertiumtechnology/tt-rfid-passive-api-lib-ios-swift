@@ -29,7 +29,7 @@
 /// A concrete instance of AbstractResponseListener has to set for every
 /// class Tag object instance to receive notification about methods
 /// invocation.
-protocol AbstractResponseListenerProtocol {
+public protocol AbstractResponseListenerProtocol {
 
     /// Invoked after a EPC_tag#writeID(byte[], short) writeID method
     /// invocation to notify result.

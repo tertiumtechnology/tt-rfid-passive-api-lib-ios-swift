@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class AbstractScanListener
+public class AbstractScanListener
 {
     static let READER_DISCONNECT_BLE_NOT_INITIALIZED_ERROR: Int = 1
 }

@@ -23,7 +23,7 @@
  */
 import Foundation
 
-protocol AbstractInventoryListenerProtocol {
+public protocol AbstractInventoryListenerProtocol {
     /// Invoked after an inventory operation to notify the discovered tags list.
     ///
     /// - parameter tag - The tag discovered

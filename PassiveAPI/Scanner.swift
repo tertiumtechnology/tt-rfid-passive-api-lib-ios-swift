@@ -25,7 +25,7 @@ import Foundation
 import TxRxLib
 
 /// Performs the scanning of Tertium Ble Devices
-class Scanner: TxRxDeviceScanProtocol {
+public class Scanner: TxRxDeviceScanProtocol {
     class Timeouts {
         static let S_TERTIUM_TIMEOUT_CONNECT = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT
         static let S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET = TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET
@@ -103,19 +103,19 @@ class Scanner: TxRxDeviceScanProtocol {
     }
     
     // TxRxDeviceScanProtocol implementation
-    func deviceScanBegan() {
+    public func deviceScanBegan() {
         delegate?.deviceScanBeganEvent()
     }
     
-    func deviceFound(device: TxRxDevice) {
+    public func deviceFound(device: TxRxDevice) {
         delegate?.deviceFoundEvent(deviceName: device.name)
     }
     
-    func deviceScanEnded() {
+    public func deviceScanEnded() {
         delegate?.deviceScanEndedEvent()
     }
     
-    func deviceScanError(error: NSError) {
+    public func deviceScanError(error: NSError) {
         if error.code == TxRxManagerErrors.ErrorCodes.ERROR_BLUETOOTH_NOT_READY_OR_LOST.rawValue {
             delegate?.deviceScanErrorEvent(error: AbstractScanListener.READER_DISCONNECT_BLE_NOT_INITIALIZED_ERROR)
             return
@@ -124,7 +124,7 @@ class Scanner: TxRxDeviceScanProtocol {
         delegate?.deviceScanErrorEvent(error: AbstractScanListener.READER_DISCONNECT_BLE_NOT_INITIALIZED_ERROR)
     }
     
-    func deviceInternalError(error: NSError) {
+    public func deviceInternalError(error: NSError) {
         // TODO: Handle?
         delegate?.deviceScanErrorEvent(error: AbstractScanListener.READER_DISCONNECT_BLE_NOT_INITIALIZED_ERROR)
     }

@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class EPC_tag: Tag {    
+public class EPC_tag: Tag {    
     /// EPC tag reserved memory bank.
     static let RESERVED_MEMORY_BANK: Int = 0x00
     

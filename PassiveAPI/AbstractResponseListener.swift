@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class AbstractResponseListener {
+public class AbstractResponseListener {
     /// {@link EPC_tag#read(int, int, byte[]) read} or
     /// {@link ISO15693_tag#read(int, int) read} command.
     static let READ_COMMAND: Int = 100

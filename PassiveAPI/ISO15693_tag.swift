@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class ISO15693_tag: Tag {
+public class ISO15693_tag: Tag {
 	/// Class Constructor
 	///
     /// - parameter ID - the tag ID

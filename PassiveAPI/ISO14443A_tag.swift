@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class ISO14443A_tag: Tag {
+public class ISO14443A_tag: Tag {
 	/// Class Constructor
 	///
     /// - parameter ID             - the tag ID

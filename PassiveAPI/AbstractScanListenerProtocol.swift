@@ -23,7 +23,7 @@
  */
 import Foundation
 
-protocol AbstractScanListenerProtocol {
+public protocol AbstractScanListenerProtocol {
     /// Informs the listener a device has been found
     func deviceFoundEvent(deviceName: String)
     

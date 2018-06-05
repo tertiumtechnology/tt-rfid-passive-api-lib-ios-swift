@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class Tag {
+public class Tag {
     private static let DEFAULT_TIMEOUT: Int = 2000
     internal let ID: [UInt8]
     var reverseID: Bool

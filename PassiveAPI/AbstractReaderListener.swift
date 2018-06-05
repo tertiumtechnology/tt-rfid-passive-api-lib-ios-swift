@@ -23,7 +23,7 @@
  */
 import Foundation
 
-class AbstractReaderListener
+public class AbstractReaderListener
 {   
     /// Inventory scan started by {@link PassiveReader#doInventory()
     /// doInventory} method invocation.

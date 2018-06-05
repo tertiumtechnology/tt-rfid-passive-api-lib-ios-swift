@@ -24,7 +24,7 @@
 import Foundation
 import TxRxLib
 
-class BleSettings
+public class BleSettings
 {
     //
     private let deviceManager = TxRxManager.getInstance()
@@ -37,7 +37,7 @@ class BleSettings
     /// NOTE: CLASS Method
     ///
     /// - returns: The singleton instance of TxRxManager class
-    class func getInstance() -> BleSettings {
+    public class func getInstance() -> BleSettings {
         return _sharedInstance;
     }
     
@@ -45,7 +45,7 @@ class BleSettings
     ///
     /// - parameter timeOutType: the timeout event
     /// - returns: the event timeout value, in MILLISECONDS
-    func getTimeOutValue(timeOutType: String) -> UInt32 {
+    public func getTimeOutValue(timeOutType: String) -> UInt32 {
         return deviceManager.getTimeOutValue(timeOutType: timeOutType)
     }
     
@@ -53,12 +53,12 @@ class BleSettings
     ///
     /// - parameter timeOutValue: the timeout value, in MILLISECONDS
     /// - parameter timeOutType: the timeout event
-    func setTimeOutValue(timeOutValue: UInt32, timeOutType: String) {
+    public func setTimeOutValue(timeOutValue: UInt32, timeOutType: String) {
         return deviceManager.setTimeOutValue(timeOutValue: timeOutValue, timeOutType: timeOutType)
     }
     
     /// Resets timeout values to default values
-    func setTimeOutDefaults() {
+    public func setTimeOutDefaults() {
         deviceManager.setTimeOutDefaults()
     }
 }

@@ -25,7 +25,7 @@ import Foundation
 import TxRxLib
 
 /// Represents the RFID/NFC tag reader
-class PassiveReader: TxRxDeviceDataProtocol {
+public class PassiveReader: TxRxDeviceDataProtocol {
 	/// Passive reader internal state constants
 	static internal let ERROR_STATUS: Int = -1
     static internal let NOT_INITIALIZED_STATUS: Int = 0
@@ -363,7 +363,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
 	///
 	/// - parameter flag - flag byte (not encrypted)
 	/// - parameter - command - the command to send to the tag
-	func ISO15693encryptedTunnel(flag: UInt8, command: [UInt8]) {
+	public func ISO15693encryptedTunnel(flag: UInt8, command: [UInt8]) {
         if status != PassiveReader.READY_STATUS {
             if let readerListenerDelegate = readerListenerDelegate {
                 readerListenerDelegate.resultEvent(command: AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
@@ -390,7 +390,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// The result of the tunnel operation is notified invoking reader listener
     /// methods
     /// - parameter command - the command to send to the tag
-    func ISO15693tunnel(command: [UInt8]) {
+    public func ISO15693tunnel(command: [UInt8]) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.ISO15693_TUNNEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -402,21 +402,21 @@ class PassiveReader: TxRxDeviceDataProtocol {
     }
     
 	/// Closes the reader driver
-    func close() {
+    internal func close() {
         // TODO: device manager close ?
         disconnect()
         deviceManager.disconnectDevice(device: connectedDevice!)
         status = PassiveReader.NOT_INITIALIZED_STATUS
     }
     
-    func getConnectedDevice() -> TxRxDevice? {
+    public func getConnectedDevice() -> TxRxDevice? {
         return connectedDevice
     }
     
 	/// Connects the reader device
 	///
 	/// - parameter readerAddress - The device name
-    func connect(readerAddress: String) {
+    public func connect(readerAddress: String) {
         // TODO: implement caching system and keep UUIDs
         var device: TxRxDevice?
         
@@ -432,7 +432,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     }
     
 	/// Disconnects from the Ble device
-    func disconnect() {
+    public func disconnect() {
         if let device = connectedDevice {
             if device.isConnected {
                 deviceManager.disconnectDevice(device: connectedDevice!)
@@ -445,7 +445,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) 
     /// and AbstractInventoryListener.inventoryEvent(Tag) methods invocation.
-    func doInventory() {
+    public func doInventory() {
         if status != PassiveReader.READY_STATUS || !inventoryEnabled {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.INVENTORY_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -465,7 +465,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.batteryLevelEvent(float)
     /// methods invocation.
-    func getBatteryLevel() {
+    public func getBatteryLevel() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_BATTERY_LEVEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -486,7 +486,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int)
     /// and AbstractReaderListener.batteryStatusEvent(Int) methods invocation.
-	func getBatteryStatus() {
+	public func getBatteryStatus() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_BATTERY_STATUS_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -502,7 +502,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.EPCfrequencyEvent(Int) invocation.
-    func getEPCfrequency() {
+    public func getEPCfrequency() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_EPC_FREQUENCY_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -523,7 +523,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.firmwareVersionEvent(Int, Int) methods invocation.
-    func getFirmwareVersion() {
+    public func getFirmwareVersion() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_FIRMWARE_VERSION_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -539,7 +539,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.ISO15693bitrateEvent(Int, boolean) methods invocation.
-    func getISO15693bitrate() {
+    public func getISO15693bitrate() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_ISO15693_BITRATE_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -560,7 +560,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.ISO15693extensionFlagEvent(boolean, boolean) methods invocation.
-    func getISO15693extensionFlag() {
+    public func getISO15693extensionFlag() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_ISO15693_EXTENSION_FLAG_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -581,7 +581,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.ISO15693optionBitsEvent(Int) methods invocation.
-    func getISO15693optionBits() {
+    public func getISO15693optionBits() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_ISO15693_OPTION_BITS_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             
@@ -604,7 +604,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and 
 	/// AbstractReaderListener.RFforISO15693tunnelEvent(Int, Int) methods invocation.
-    func getRFforISO15693tunnel() {
+    public func getRFforISO15693tunnel() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_RF_FOR_ISO15693_TUNNEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             
@@ -627,7 +627,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and
     /// AbstractReaderListener.RFpowerEvent(Int, Int) methods invocation.
-    func getRFpower() {
+    public func getRFpower() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_RF_POWER_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             
@@ -647,7 +647,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) and 
     /// AbstractReaderListener.shutdownTimeEvent(Int) methods invocation.
-    func getShutdownTime() {
+    public func getShutdownTime() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_SHUTDOWN_TIME_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -661,7 +661,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Test the BLE link with reader device.
     ///
     /// - returns true - if the reader device is linked by BLE
-    func isAvailable(deviceAddress: String) -> Bool {
+    public func isAvailable(deviceAddress: String) -> Bool {
         var name: String?
         
         name = deviceManager.getDeviceName(device: connectedDevice!)
@@ -671,7 +671,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Test the reader device type.
     ///
     /// - returns true - if the reader is an HF device for ISO15693 and/or ISO14443 tags.     
-    func isHF() -> Bool {
+    public func isHF() -> Bool {
         if status < PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.IS_HF_COMMAND, error: AbstractReaderListener.READER_DRIVER_NOT_READY_ERROR)
             return false
@@ -683,7 +683,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Test the reader device type.
     ///
     /// - returns true - if the reader is an UHF device for EPC tags.
-    func isUHF() -> Bool {
+    public func isUHF() -> Bool {
         if status < PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.IS_UHF_COMMAND, error: AbstractReaderListener.READER_DRIVER_NOT_READY_ERROR)
             return false
@@ -698,7 +698,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
 	///
     /// - parameter ledStatus - if true light on the LED
     /// - parameter ledBlinking - the time for LED light to blink (milliseconds: 10-2540, 0 means no blink)     
-    func light(ledStatus: Bool, ledBlinking: Int) {
+    public func light(ledStatus: Bool, ledBlinking: Int) {
         var led = [UInt8(0), UInt8(0)]
         
         if status != PassiveReader.READY_STATUS {
@@ -728,7 +728,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
 	///
     /// - parameter frequency - the RF frequency     
-    func setEPCfrequency(frequency: Int) {
+    public func setEPCfrequency(frequency: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_EPC_FREQUENCY_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -755,7 +755,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter bitrate - the bit rate
     /// - parameter permanent - if true the extension flag configuration is permanent     
-    func setISO15693bitrate(bitrate: Int, permanent: Bool) {
+    public func setISO15693bitrate(bitrate: Int, permanent: Bool) {
         var data = [UInt8(0), UInt8(0)]
         
         if status != PassiveReader.READY_STATUS {
@@ -792,7 +792,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter flag - if true the extension flag is configured
     /// - parameter permanent - if true the extension flag configuration is permanent
-    func setISO15693extensionFlag(flag: Bool, permanent: Bool) {
+    public func setISO15693extensionFlag(flag: Bool, permanent: Bool) {
         var data = [UInt8(0), UInt8(0)]
         
         if status != PassiveReader.READY_STATUS {
@@ -822,7 +822,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
     ///
     /// - parameter optionBits - the option bits     
-    func setISO15693optionBits(optionBits: Int) {
+    public func setISO15693optionBits(optionBits: Int) {
         var data = [UInt8(0), UInt8(0)]
         
         if status != PassiveReader.READY_STATUS {
@@ -853,7 +853,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
     ///
     /// - parameter mode - the inventory operating mode     
-    func setInventoryMode(mode: Int) {
+    public func setInventoryMode(mode: Int) {
         var data = [UInt8(0)]
         
         if status != PassiveReader.READY_STATUS {
@@ -882,7 +882,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// - parameter feedback - the reader device local feedback for detected tag(s)
     /// - parameter timeout  - the inventory scan time (milliseconds: 100-2000)
     /// - parameter interval - the inventory repetition period (milliseconds: 100-25500)   
-    func setInventoryParameters(feedback: Int, timeout: Int, interval: Int) {
+    public func setInventoryParameters(feedback: Int, timeout: Int, interval: Int) {
         var data = [UInt8](repeating: 0, count: 6)
 
         if status != PassiveReader.READY_STATUS {
@@ -932,7 +932,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
     ///
     /// - parameter - standard the standard type     
-	func setInventoryType(standard: Int) {
+	public func setInventoryType(standard: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_INVENTORY_TYPE_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -955,7 +955,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// - parameter delay - the delay from RF power switch-on and command transmission (milliseconds: 0-255)
     /// - parameter timeout - the time before RF power switch-off (seconds: 0-255)     
-    func setRFforISO15693tunnel(delay: Int, timeout: Int) {
+    public func setRFforISO15693tunnel(delay: Int, timeout: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_RF_FOR_ISO15693_TUNNEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -987,7 +987,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter level - the RF power level
     /// - parameter mode - the RF power mode     
-    func setRFpower(level: Int, mode: Int) {
+    public func setRFpower(level: Int, mode: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_RF_POWER_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -1033,7 +1033,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
     ///
     /// - parameter time - the inactive time before reader device switch off (seconds: 10-64800)
-    func setShutdownTime(time: Int) {
+    public func setShutdownTime(time: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_SHUTDOWN_TIME_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -1062,7 +1062,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// - parameter duration - the single sound duration (milliseconds: 10-2550)
     /// - parameter interval - the time interval for repeated sounds (milliseconds: 10-2550)
     /// - parameter repetition - the number of sound repetition (0-255)
-    func sound(frequency: Int, step: Int, duration: Int, interval: Int, repetition: Int) {
+    public func sound(frequency: Int, step: Int, duration: Int, interval: Int, repetition: Int) {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SOUND_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -1113,7 +1113,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) 
 	/// and AbstractReaderListener.availabilityEvent(boolean) methods invocation.
-    func testAvailability() {
+    public func testAvailability() {
         if status != PassiveReader.READY_STATUS {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.TEST_AVAILABILITY_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
             return
@@ -1175,7 +1175,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter device: The TxRxDevice on which the error occoured
     /// - parameter error: An NSError class instance describing the error
-    func deviceConnectError(device: TxRxDevice, error: NSError) {
+    public func deviceConnectError(device: TxRxDevice, error: NSError) {
         status = PassiveReader.ERROR_STATUS
 		connectedDevice = nil
         switch error.code {
@@ -1190,14 +1190,14 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Informs delegate a device has been connected
     ///
     /// - parameter device: The connected TxRxDevice
-    func deviceConnected(device: TxRxDevice) {
+    public func deviceConnected(device: TxRxDevice) {
         status = PassiveReader.UNINITIALIZED_STATUS
     }
     
     /// Informs a connected device is ready to operate and has been identified as a Tertium BLE device
     ///
     /// - parameter device: The TxRxDevice correctly identified
-    func deviceReady(device: TxRxDevice) {
+    public func deviceReady(device: TxRxDevice) {
         connectedDevice = device
         status = PassiveReader.UNINITIALIZED_STATUS
 		
@@ -1259,7 +1259,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter device: The TxRxDevice on which the error occoured
     /// - parameter error: An NSError class instance describing the error
-    func deviceWriteError(device: TxRxDevice, error: NSError) {
+    public func deviceWriteError(device: TxRxDevice, error: NSError) {
 		let errorCode = AbstractReaderListener.READER_WRITE_FAIL_ERROR
 		
 		if error.code == TxRxManagerErrors.ErrorCodes.ERROR_DEVICE_SENDING_DATA_TIMEOUT.rawValue {
@@ -1318,10 +1318,10 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Informs delegate the last sendData operation has succeeded
     ///
     /// - parameter device: The TxRxDevice which successfully received the data
-    func sentData(device: TxRxDevice) {
+    public func sentData(device: TxRxDevice) {
     }
 	
-	func readNotifyTimeout() {
+	public func readNotifyTimeout() {
 		switch status {
 			case PassiveReader.ERROR_STATUS,
 				 PassiveReader.NOT_INITIALIZED_STATUS,
@@ -1373,7 +1373,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter device: The TxRxDevice on which the error occoured
     /// - parameter error: An NSError class instance describing the error
-    func deviceReadError(device: TxRxDevice, error: NSError) {
+    public func deviceReadError(device: TxRxDevice, error: NSError) {
         let errorCode: Int = AbstractReaderListener.READER_READ_FAIL_ERROR
 		
 		if error.code == TxRxManagerErrors.ErrorCodes.ERROR_DEVICE_RECEIVING_DATA_TIMEOUT.rawValue {
@@ -1477,7 +1477,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     ///
     /// - parameter device: The TxRxDevice which sent the data
     /// - parameter data: the data received from the device (usually ASCII bytes)
-    func receivedData(device: TxRxDevice, data: Data) {
+    public func receivedData(device: TxRxDevice, data: Data) {
         var dataString: String?
         var tunnelAnswer: [UInt8]? = nil
         var responseType: String?
@@ -1793,7 +1793,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     
     /// Informs delegate a device has been successfully disconnected
     /// - parameter device: The TxRxDevice disconnected
-    func deviceDisconnected(device: TxRxDevice) {
+    public func deviceDisconnected(device: TxRxDevice) {
         readerListenerDelegate?.disconnectionEvent()
         status = PassiveReader.NOT_INITIALIZED_STATUS
         connectedDevice = nil
@@ -1824,7 +1824,7 @@ class PassiveReader: TxRxDeviceDataProtocol {
     /// Informs delegate a device critical error happened. NO further interaction with this TxRxDevice class should be done
     /// - parameter device: The TxRxDevice on which the error occoured
     /// - parameter error: An NSError class instance describing the error
-    func deviceError(device: TxRxDevice, error: NSError) {
+    public func deviceError(device: TxRxDevice, error: NSError) {
         disconnect()
     }
 	
