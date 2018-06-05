@@ -106,32 +106,32 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 	internal var pending: Int = 0
     
     /// EPC standard.
-    static let EPC_STANDARD:Int = 0x00
+    public static let EPC_STANDARD:Int = 0x00
     
     /// ISO-15693 standard.
-    static let ISO15693_STANDARD:Int = 0x01
+    public static let ISO15693_STANDARD:Int = 0x01
     
     /// ISO-15443A standard.
-    static let ISO14443A_STANDARD:Int = 0x02
+    public static let ISO14443A_STANDARD:Int = 0x02
     
     /// ISO-15693 and ISO14443A standards.
-    static let ISO15693_AND_ISO14443A_STANDARD:Int = 0x03
+    public static let ISO15693_AND_ISO14443A_STANDARD:Int = 0x03
     
     /// Inventory scan started by doInventory() method invocation.
-    static let NORMAL_MODE:Int = 0x00
+    public static let NORMAL_MODE:Int = 0x00
     
     /// Inventory scan started periodically (period set by PassiveReader.setInventoryParameters(Int, Int, Int))
     /// method invocation.
-    static let SCAN_ON_TIME_MODE:Int = 0x01
+    public static let SCAN_ON_TIME_MODE:Int = 0x01
     
     /// Inventory scan started by the reader device button pression.
-    static let SCAN_ON_INPUT_MODE:Int = 0x02
+    public static let SCAN_ON_INPUT_MODE:Int = 0x02
     
     /// Sound and LED light feedback for inventory successful operation.
-    static let FEEDBACK_SOUND_AND_LIGHT:Int = 0x00
+    public static let FEEDBACK_SOUND_AND_LIGHT:Int = 0x00
     
     /// No local feedback for inventory successful operation.
-    static let NO_FEEDBACK:Int = 0x01
+    public static let NO_FEEDBACK:Int = 0x01
     
     /// Inventory operation get ISO15693 and/or ISO14443A ID only.
     static private let ID_ONLY_FORMAT:Int = 0x01
@@ -150,170 +150,170 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     static private let ECP_AND_PC_AND_TID_FORMAT:Int = 0x07
     
     /// Low battery status
-    static let LOW_BATTERY_STATUS:Int = 0x00
+    public static let LOW_BATTERY_STATUS:Int = 0x00
     
     /// Charged battery status
-    static let CHARGED_BATTERY_STATUS:Int = 0x01
+    public static let CHARGED_BATTERY_STATUS:Int = 0x01
     
     /// Charging battery status
-    static let CHARGING_BATTERY_STATUS:Int = 0x02
+    public static let CHARGING_BATTERY_STATUS:Int = 0x02
     
     /// HF reader device half RF power
-    static let HF_RF_HALF_POWER:Int = 0x00
+    public static let HF_RF_HALF_POWER:Int = 0x00
     
     /// HF reader device full RF power
-    static let HF_RF_FULL_POWER:Int = 0x01
+    public static let HF_RF_FULL_POWER:Int = 0x01
     
     /// HF reader device automatic RF power management
-    static let HF_RF_AUTOMATIC_POWER:Int = 0x00
+    public static let HF_RF_AUTOMATIC_POWER:Int = 0x00
     
     /// HF reader device fixed RF power
-    static let HF_RF_FIXED_POWER:Int = 0x01
+    public static let HF_RF_FIXED_POWER:Int = 0x01
     
     /// UHF reader device 0dB RF power
-    static let UHF_RF_POWER_0_DB:Int = 0x00
+    public static let UHF_RF_POWER_0_DB:Int = 0x00
     
     /// UHF reader device -1dB RF power
-    static let UHF_RF_POWER_MINUS_1_DB:Int = 0x01
+    public static let UHF_RF_POWER_MINUS_1_DB:Int = 0x01
     
     /// UHF reader device -2dB RF power
-    static let UHF_RF_POWER_MINUS_2_DB:Int = 0x02
+    public static let UHF_RF_POWER_MINUS_2_DB:Int = 0x02
     
     /// UHF reader device -3dB RF power
-    static let UHF_RF_POWER_MINUS_3_DB:Int = 0x03
+    public static let UHF_RF_POWER_MINUS_3_DB:Int = 0x03
     
     /// UHF reader device -4dB RF power
-    static let UHF_RF_POWER_MINUS_4_DB:Int = 0x04
+    public static let UHF_RF_POWER_MINUS_4_DB:Int = 0x04
     
     /// UHF reader device -5dB RF power
-    static let UHF_RF_POWER_MINUS_5_DB:Int = 0x05
+    public static let UHF_RF_POWER_MINUS_5_DB:Int = 0x05
     
     /// UHF reader device -6dB RF power
-    static let UHF_RF_POWER_MINUS_6_DB:Int = 0x06
+    public static let UHF_RF_POWER_MINUS_6_DB:Int = 0x06
     
     /// UHF reader device -7dB RF power
-    static let UHF_RF_POWER_MINUS_7_DB:Int = 0x07
+    public static let UHF_RF_POWER_MINUS_7_DB:Int = 0x07
     
     /// UHF reader device -8dB RF power
-    static let UHF_RF_POWER_MINUS_8_DB:Int = 0x08
+    public static let UHF_RF_POWER_MINUS_8_DB:Int = 0x08
     
     /// UHF reader device -9dB RF power
-    static let UHF_RF_POWER_MINUS_9_DB:Int = 0x09
+    public static let UHF_RF_POWER_MINUS_9_DB:Int = 0x09
     
     /// UHF reader device -10dB RF power
-    static let UHF_RF_POWER_MINUS_10_DB:Int = 0x0A
+    public static let UHF_RF_POWER_MINUS_10_DB:Int = 0x0A
     
     /// UHF reader device -11dB RF power
-    static let UHF_RF_POWER_MINUS_11_DB:Int = 0x0B
+    public static let UHF_RF_POWER_MINUS_11_DB:Int = 0x0B
     
     /// UHF reader device -12dB RF power
-    static let UHF_RF_POWER_MINUS_12_DB:Int = 0x0C
+    public static let UHF_RF_POWER_MINUS_12_DB:Int = 0x0C
     
     /// UHF reader device -13dB RF power
-    static let UHF_RF_POWER_MINUS_13_DB:Int = 0x0D
+    public static let UHF_RF_POWER_MINUS_13_DB:Int = 0x0D
     
     /// UHF reader device -14dB RF power
-    static let UHF_RF_POWER_MINUS_14_DB:Int = 0x0E
+    public static let UHF_RF_POWER_MINUS_14_DB:Int = 0x0E
     
     /// UHF reader device -15dB RF power
-    static let UHF_RF_POWER_MINUS_15_DB:Int = 0x0F
+    public static let UHF_RF_POWER_MINUS_15_DB:Int = 0x0F
     
     /// UHF reader device -16dB RF power
-    static let UHF_RF_POWER_MINUS_16_DB:Int = 0x10
+    public static let UHF_RF_POWER_MINUS_16_DB:Int = 0x10
     
     /// UHF reader device -17dB RF power
-    static let UHF_RF_POWER_MINUS_17_DB:Int = 0x011
+    public static let UHF_RF_POWER_MINUS_17_DB:Int = 0x011
     
     /// UHF reader device -18dB RF power
-    static let UHF_RF_POWER_MINUS_18_DB:Int = 0x012
+    public static let UHF_RF_POWER_MINUS_18_DB:Int = 0x012
     
     /// UHF reader device -19dB RF power
-    static let UHF_RF_POWER_MINUS_19_DB:Int = 0x013
+    public static let UHF_RF_POWER_MINUS_19_DB:Int = 0x013
     
     /// UHF reader device automatic RF power management
-    static let UHF_RF_POWER_AUTOMATIC_MODE:Int = 0x00
+    public static let UHF_RF_POWER_AUTOMATIC_MODE:Int = 0x00
     
     /// UHF reader device fixed RF power with low bias
-    static let UHF_RF_POWER_FIXED_LOW_BIAS_MODE:Int = 0x01
+    public static let UHF_RF_POWER_FIXED_LOW_BIAS_MODE:Int = 0x01
     
     /// UHF reader device fixed RF power with high bias
-    static let UHF_RF_POWER_FIXED_HIGH_BIAS_MODE:Int = 0x02
+    public static let UHF_RF_POWER_FIXED_HIGH_BIAS_MODE:Int = 0x02
     
     /// ISO15693 tag with no option bits
-    static let ISO15693_OPTION_BITS_NONE:Int = 0x00
+    public static let ISO15693_OPTION_BITS_NONE:Int = 0x00
     
     /// ISO15693 tag with option bit for lock operations
-    static let ISO15693_OPTION_BITS_LOCK:Int = 0x01
+    public static let ISO15693_OPTION_BITS_LOCK:Int = 0x01
     
     /// ISO15693 tag with option bit for write operations
-    static let ISO15693_OPTION_BITS_WRITE:Int = 0x02
+    public static let ISO15693_OPTION_BITS_WRITE:Int = 0x02
     
     /// ISO15693 tag with option bit for read operations
-    static let ISO15693_OPTION_BITS_READ:Int = 0x04
+    public static let ISO15693_OPTION_BITS_READ:Int = 0x04
     
     /// ISO15693 tag with option bit for inventory operations
-    static let ISO15693_OPTION_BITS_INVENTORY:Int = 0x08
+    public static let ISO15693_OPTION_BITS_INVENTORY:Int = 0x08
     
     /// ISO15693 low bit-rate tag operations
-    static let ISO15693_LOW_BITRATE:Int = 0
+    public static let ISO15693_LOW_BITRATE:Int = 0
     
     /// ISO15693 high bit-rate tag operations
-    static let ISO15693_HIGH_BITRATE:Int = 1
+    public static let ISO15693_HIGH_BITRATE:Int = 1
     
     /// UHF reader device RF carrier frequency from 902.75MHz to 927.5MHz
     /// (50 radio channels with frequency hopping)
-    static let RF_CARRIER_FROM_902_75_TO_927_5_MHZ:Int = 0x00
+    public static let RF_CARRIER_FROM_902_75_TO_927_5_MHZ:Int = 0x00
     
     /// UHF reader device RF carrier frequency from 915.25MHz to 927.5MHz
     /// (25 radio channels with frequency hopping)
-    static let RF_CARRIER_FROM_915_25_TO_927_5_MHZ:Int = 0x01
+    public static let RF_CARRIER_FROM_915_25_TO_927_5_MHZ:Int = 0x01
     
     /// UHF reader device RF carrier frequency 865.7MHz (no frequency hopping)
-    static let RF_CARRIER_865_7_MHZ:Int = 0x02
+    public static let RF_CARRIER_865_7_MHZ:Int = 0x02
     
     /// UHF reader device RF carrier frequency 866.3MHz (no frequency hopping)
-    static let RF_CARRIER_866_3_MHZ:Int = 0x03
+    public static let RF_CARRIER_866_3_MHZ:Int = 0x03
     
     /// UHF reader device RF carrier frequency 866.9MHz (no frequency hopping)
-    static let RF_CARRIER_866_9_MHZ:Int = 0x04
+    public static let RF_CARRIER_866_9_MHZ:Int = 0x04
     
     /// UHF reader device RF carrier frequency 867.5MHz (no frequency hopping)
-    static let RF_CARRIER_867_5_MHZ:Int = 0x05
+    public static let RF_CARRIER_867_5_MHZ:Int = 0x05
     
     /// UHF reader device RF carrier frequency from 865.7MHz to 867.5MHz
     /// (4 radio channels with frequency hopping)
-    static let RF_CARRIER_FROM_865_7_TO_867_5_MHZ:Int = 0x06
+    public static let RF_CARRIER_FROM_865_7_TO_867_5_MHZ:Int = 0x06
     
     /// UHF reader device RF carrier frequency 915.1MHz (no frequency hopping)
-    static let RF_CARRIER_915_1_MHZ:Int = 0x07
+    public static let RF_CARRIER_915_1_MHZ:Int = 0x07
     
     /// UHF reader device RF carrier frequency 915.7MHz (no frequency hopping)
-    static let RF_CARRIER_915_7_MHZ:Int = 0x08
+    public static let RF_CARRIER_915_7_MHZ:Int = 0x08
     
     /// UHF reader device RF carrier frequency 916.3MHz (no frequency hopping)
-    static let RF_CARRIER_916_3_MHZ:Int = 0x09
+    public static let RF_CARRIER_916_3_MHZ:Int = 0x09
     
     /// UHF reader device RF carrier frequency 916.9MHz (no frequency hopping)
-    static let RF_CARRIER_916_9_MHZ:Int = 0x0A
+    public static let RF_CARRIER_916_9_MHZ:Int = 0x0A
     
     /// UHF reader device RF carrier frequency from 915.1MHz to 916.9MHz
     /// (4 radio channels with frequency hopping)
-    static let RF_CARRIER_FROM_915_1_TO_916_9_MHZ:Int = 0x0B
+    public static let RF_CARRIER_FROM_915_1_TO_916_9_MHZ:Int = 0x0B
     
     /// UHF reader device RF carrier frequency 902.75MHz (no frequency hopping)
-    static let RF_CARRIER_902_75_MHZ:Int = 0x0C
+    public static let RF_CARRIER_902_75_MHZ:Int = 0x0C
     
     /// UHF reader device RF carrier frequency 908.75MHz (no frequency hopping)
-    static let RF_CARRIER_908_75_MHZ:Int = 0x0D
+    public static let RF_CARRIER_908_75_MHZ:Int = 0x0D
     
     /// UHF reader device RF carrier frequency 915.25MHz (no frequency hopping)
-    static let RF_CARRIER_915_25_MHZ:Int = 0x0E
+    public static let RF_CARRIER_915_25_MHZ:Int = 0x0E
     
     /// UHF reader device RF carrier frequency 921.25MHz (no frequency hopping)
-    static let RF_CARRIER_921_25_MHZ:Int = 0x0F
+    public static let RF_CARRIER_921_25_MHZ:Int = 0x0F
     
     /// UHF reader device RF carrier frequency 925.25MHz (no frequency hopping)
-    static let RF_CARRIER_925_25_MHZ:Int = 0x10
+    public static let RF_CARRIER_925_25_MHZ:Int = 0x10
 	
     public static func getInstance() -> PassiveReader {
         return PassiveReader._sharedInstance
@@ -1829,22 +1829,22 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     }
 	
     // Utility methods
-    static func getStringCharAt(str: String, at: Int) -> String? {
+    public static func getStringCharAt(str: String, at: Int) -> String? {
         return PassiveReader.getStringSubString(str: str, start: at, end: at+1)
     }
 
-    static func getStringCharAsIntAt(str: String, at: Int) -> Int {
+    public static func getStringCharAsIntAt(str: String, at: Int) -> Int {
         var subStr: String?
         
         subStr = PassiveReader.getStringSubString(str: str, start: at, end: at+1)
         return Int(subStr!)!
     }
     
-    static func charToInt(char: Character) -> Int {
+    public static func charToInt(char: Character) -> Int {
         return Int(String(char))!
     }
     
-    static func getStringSubString(str: String, start: Int, end: Int) -> String {
+    public static func getStringSubString(str: String, start: Int, end: Int) -> String {
         let sIndex = str.index(str.startIndex, offsetBy: start)
         let eIndex = str.index(str.startIndex, offsetBy: end)
         let range = sIndex..<eIndex
