@@ -44,91 +44,91 @@ public class AbstractReaderListener
     static let LIGHT_COMMAND: Int = 1
     
     /// {@link PassiveReader#getBatteryStatus() getBatteryStatus} command.
-    static let GET_BATTERY_STATUS_COMMAND: Int = 2
+    public static let GET_BATTERY_STATUS_COMMAND: Int = 2
     
     /// {@link PassiveReader#getFirmwareVersion() getFirmwareVersion} command.
-    static let GET_FIRMWARE_VERSION_COMMAND: Int = 3
+    public static let GET_FIRMWARE_VERSION_COMMAND: Int = 3
     
     /// {@link PassiveReader#setShutdownTime(int) setShutdownTime} command.
-    static let SET_SHUTDOWN_TIME_COMMAND: Int = 4
+    public static let SET_SHUTDOWN_TIME_COMMAND: Int = 4
     
     /// {@link PassiveReader#getShutdownTime() getShutdownTime} command.
-    static let GET_SHUTDOWN_TIME_COMMAND: Int = 5
+    public static let GET_SHUTDOWN_TIME_COMMAND: Int = 5
     
     /// {@link PassiveReader#setInventoryMode(int) setInventoryMode} command.
-    static let SET_INVENTORY_MODE_COMMAND: Int = 6
+    public static let SET_INVENTORY_MODE_COMMAND: Int = 6
     
     /// {@link PassiveReader#setInventoryParameters(int, int, int)
     /// setInventoryParameters} command.
-    static let SET_INVENTORY_PARAMETERS_COMMAND: Int = 7
+    public static let SET_INVENTORY_PARAMETERS_COMMAND: Int = 7
     
     /// {@link PassiveReader#setRFpower(int, int) setRFpower} command.
-    static let SET_RF_POWER_COMMAND: Int = 8
+    public static let SET_RF_POWER_COMMAND: Int = 8
     
     /// {@link PassiveReader#getRFpower() getRFpower} command.
-    static let GET_RF_POWER_COMMAND: Int = 9
+    public static let GET_RF_POWER_COMMAND: Int = 9
     
     /// {@link PassiveReader#doInventory() } command.
-    static let INVENTORY_COMMAND: Int = 10
+    public static let INVENTORY_COMMAND: Int = 10
     
     /// {@link PassiveReader#setRFforISO15693tunnel(int, int)
     /// setRFforISO15693tunnel} command.
-    static let SET_RF_FOR_ISO15693_TUNNEL_COMMAND: Int = 11
+    public static let SET_RF_FOR_ISO15693_TUNNEL_COMMAND: Int = 11
     
     /// {@link PassiveReader#getRFforISO15693tunnel() getRFforISO15693tunnel}
     /// command.
-    static let GET_RF_FOR_ISO15693_TUNNEL_COMMAND: Int = 12
+    public static let GET_RF_FOR_ISO15693_TUNNEL_COMMAND: Int = 12
     
     /// {@link PassiveReader#setISO15693optionBits(int) setISO15693optionBits}
     /// command.
-    static let SET_ISO15693_OPTION_BITS_COMMAND: Int = 13
+    public static let SET_ISO15693_OPTION_BITS_COMMAND: Int = 13
     
     /// {@link PassiveReader#getISO15693optionBits() getISO15693optionBits}
     /// command.
-    static let GET_ISO15693_OPTION_BITS_COMMAND: Int = 14
+    public static let GET_ISO15693_OPTION_BITS_COMMAND: Int = 14
     
     /// {@link PassiveReader#setISO15693extensionFlag(boolean, boolean)
     /// setISO15693extensionFlag} command.
-    static let SET_ISO15693_EXTENSION_FLAG_COMMAND: Int = 15
+    public static let SET_ISO15693_EXTENSION_FLAG_COMMAND: Int = 15
     
     /// {@link PassiveReader#getISO15693extensionFlag() getISO15693extensionFlag}
     /// command.
-    static let GET_ISO15693_EXTENSION_FLAG_COMMAND: Int = 16
+    public static let GET_ISO15693_EXTENSION_FLAG_COMMAND: Int = 16
     
     /// {@link PassiveReader#setISO15693bitrate(int, boolean) setISO15693bitrate}
     /// command.
-    static let SET_ISO15693_BITRATE_COMMAND: Int = 17
+    public static let SET_ISO15693_BITRATE_COMMAND: Int = 17
     
     /// {@link PassiveReader#getISO15693bitrate() getISO15693bitrate} command
-    static let GET_ISO15693_BITRATE_COMMAND: Int = 18
+    public static let GET_ISO15693_BITRATE_COMMAND: Int = 18
     
     /// {@link PassiveReader#setEPCfrequency(int) setEPCfrequency} command.
-    static let SET_EPC_FREQUENCY_COMMAND: Int = 19
+    public static let SET_EPC_FREQUENCY_COMMAND: Int = 19
     
     /// {@link PassiveReader#getEPCfrequency() getEPCfrequency} command.
-    static let GET_EPC_FREQUENCY_COMMAND: Int = 20
+    public static let GET_EPC_FREQUENCY_COMMAND: Int = 20
     
     /// {@link PassiveReader#testAvailability() testAvailability} command.
-    static let TEST_AVAILABILITY_COMMAND: Int = 21
+    public static let TEST_AVAILABILITY_COMMAND: Int = 21
     
     /// {@link PassiveReader#getBatteryLevel() getBatteryLevel} command.
-    static let GET_BATTERY_LEVEL_COMMAND: Int = 22
+    public static let GET_BATTERY_LEVEL_COMMAND: Int = 22
     
     /// {@link PassiveReader#setInventoryType(int) setInventoryType} command.
-    static let SET_INVENTORY_TYPE_COMMAND: Int = 23
+    public static let SET_INVENTORY_TYPE_COMMAND: Int = 23
     
     /// {@link PassiveReader#ISO15693tunnel(byte[]) ISO15693tunnel} command.
-    static let ISO15693_TUNNEL_COMMAND: Int = 24
+    public static let ISO15693_TUNNEL_COMMAND: Int = 24
     
     /// {@link PassiveReader#ISO15693encryptedTunnel(byte, byte[])
     /// ISO15693encryptedTunnel} command.
-    static let ISO15693_ENCRYPTEDTUNNEL_COMMAND: Int = 25
+    public static let ISO15693_ENCRYPTEDTUNNEL_COMMAND: Int = 25
     
     /// {@link PassiveReader#isHF() isHF} command.
-    static let IS_HF_COMMAND: Int = 26
+    public static let IS_HF_COMMAND: Int = 26
     
     /// {@link PassiveReader#isUHF() isUHF} command.
-    static let IS_UHF_COMMAND: Int = 27
+    public static let IS_UHF_COMMAND: Int = 27
     
     /// Successful command code (no error).
     static let NO_ERROR: Int = 0x00
