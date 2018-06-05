@@ -84,9 +84,9 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     internal var connectedDevice: TxRxDevice?
 	
 	/// Class delegates
-	var readerListenerDelegate: AbstractReaderListenerProtocol? = nil
-    var inventoryListenerDelegate: AbstractInventoryListenerProtocol? = nil
-    var responseListenerDelegate: AbstractResponseListenerProtocol? = nil
+	public var readerListenerDelegate: AbstractReaderListenerProtocol? = nil
+    public var inventoryListenerDelegate: AbstractInventoryListenerProtocol? = nil
+    public var responseListenerDelegate: AbstractResponseListenerProtocol? = nil
 	
 	private var inventoryMode = 0, mode: Int = 0
     private var inventoryFeedback = 0, feedback: Int = 0
@@ -327,7 +327,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         inventoryMode = PassiveReader.NORMAL_MODE
     }
     
-    static func bytesToString(bytes: [UInt8]?) -> String {
+    public static func bytesToString(bytes: [UInt8]?) -> String {
         var str: String = ""
         
         if let bytes = bytes {
@@ -341,15 +341,15 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         return str
     }
     
-	static func byteToHex(val: Int) -> String {
+	public static func byteToHex(val: Int) -> String {
 		return String(format:"%02X", val & 0xFF)
 	}
 	
-	static func hexToByte(hex: String) -> Int {
+	public static func hexToByte(hex: String) -> Int {
 		return Int(strtoul(hex, nil, 16))
 	}
 	
-	static func hexToWord(hex: String) -> Int {
+	public static func hexToWord(hex: String) -> Int {
 		return Int(strtoul(hex, nil, 16))
 	}
 	
