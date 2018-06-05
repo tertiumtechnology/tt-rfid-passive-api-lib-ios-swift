@@ -43,7 +43,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     private let deviceManager: TxRxManager = TxRxManager.getInstance()
     
     /// Gets Scanner class singleton instance
-    static func getInstance() -> Scanner {
+    public static func getInstance() -> Scanner {
         return Scanner.instance
     }
     
@@ -52,19 +52,19 @@ public class Scanner: TxRxDeviceScanProtocol {
     }
     
     /// Commences the scanning of devices
-    func startScan() {
+    public func startScan() {
         deviceManager.startScan()
     }
     
     /// Returns wether device scanning began
     ///
     /// - returns - bool indicating if the scanning of devices began
-    func isScanning() -> Bool {
+    public func isScanning() -> Bool {
         return deviceManager._isScanning
     }
     
     /// Stops device scanning
-    func stopScan() {
+    public func stopScan() {
         deviceManager.stopScan()
     }
     
@@ -72,7 +72,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     ///
     /// - parameter device: the device name
     /// - returns: the device instance, if found, otherwise nil
-    func deviceFromDeviceName(name: String) -> TxRxDevice? {
+    public func deviceFromDeviceName(name: String) -> TxRxDevice? {
         return deviceManager.deviceFromDeviceName(name: name)
     }
     
@@ -80,7 +80,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     ///
     /// - parameter device: the device instance
     /// - returns: the device name
-    func getDeviceName(device: TxRxDevice) -> String {
+    public func getDeviceName(device: TxRxDevice) -> String {
         return deviceManager.getDeviceName(device: device)
     }
     
@@ -90,7 +90,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     ///
     /// - parameter device: the device indexed name
     /// - returns: the device instance, if found, otherwise nil
-    func deviceFromIndexedName(name: String) -> TxRxDevice? {
+    public func deviceFromIndexedName(name: String) -> TxRxDevice? {
         return deviceManager.deviceFromIndexedName(name: name)
     }
     
@@ -98,7 +98,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     ///
     /// - parameter device: the device to get indexed name from
     /// - returns: the device instance, if found, otherwise nil
-    func getDeviceIndexedName(device: TxRxDevice) -> String {
+    public func getDeviceIndexedName(device: TxRxDevice) -> String {
         return deviceManager.getDeviceIndexedName(device: device)
     }
     
