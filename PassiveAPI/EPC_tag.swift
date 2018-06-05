@@ -102,7 +102,7 @@ public class EPC_tag: Tag {
 	/// Get tag PC + ID.
 	///
 	/// - returns - the tag PC + ID as byte array
-	func getExtendedID() -> [UInt8] {
+	public func getExtendedID() -> [UInt8] {
 		var extendedID = [UInt8](repeating: 0, count: 2 + ID.count)
 		let tmp = String(format:"%04X", PC)
 		extendedID[0] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: tmp, start: 0, end: 2)))
@@ -117,7 +117,7 @@ public class EPC_tag: Tag {
     /// Get tag PC (Protocol Control).
     ///
     /// - returns - the tag Protocol Control
-    func getPC() -> UInt16 {
+    public func getPC() -> UInt16 {
         return PC
     }
     
@@ -127,7 +127,7 @@ public class EPC_tag: Tag {
 	/// AbstractResponseListener.killEvent([UInt8], Int)
     ///
     /// - parameter password - tag kill password
-    func kill(password: [UInt8]) {
+    public func kill(password: [UInt8]) {
 		var params = [UInt8](repeating: 0, count: 3)
 		var command: String
 		
@@ -163,7 +163,7 @@ public class EPC_tag: Tag {
     /// 
 	/// - parameter lock_type -	the lock type
     /// - parameter password - 	tag access password (may be null or empty)
-    func lock(lock_type: Int, password: [UInt8]?) {
+    public func lock(lock_type: Int, password: [UInt8]?) {
 		var payload = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String
@@ -201,7 +201,7 @@ public class EPC_tag: Tag {
     /// - parameter address - the tag memory address
     /// - parameter blocks - the number of memory 2-bytes blocks to read (1-50)
     /// - parameter password - tag access password (may be null or empty)
-    func read(address: Int, blocks: Int, password: [UInt8]?) {
+    public func read(address: Int, blocks: Int, password: [UInt8]?) {
 		var memoryToRead = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String
@@ -249,7 +249,7 @@ public class EPC_tag: Tag {
     /// 
     /// - parameter length - TID length (bytes)
     /// - parameter password - tag read password (may be null or empty)
-    func readTID(length: Int, password: [UInt8]?) {
+    public func readTID(length: Int, password: [UInt8]?) {
 		var memoryToRead = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String
@@ -283,7 +283,7 @@ public class EPC_tag: Tag {
 		passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: command.data(using: String.Encoding.ascii)!)
 	}
 	
-    override func toString() -> String {
+    public override func toString() -> String {
         var tmp = String(format: "%04X", PC)
 		
 		if (reverseID) {
@@ -307,7 +307,7 @@ public class EPC_tag: Tag {
     /// - parameter address - the tag memory address
     /// - parameter data - the data bytes to write
     /// - parameter password - tag access password (may be null or empty)
-    func write(address: Int, data: [UInt8], password: [UInt8]?) {
+    public func write(address: Int, data: [UInt8], password: [UInt8]?) {
 		var memoryToWrite = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var blocks: UInt8
@@ -356,7 +356,7 @@ public class EPC_tag: Tag {
     /// 
     /// - parameter accessPassword - the new tag access password (4 bytes)
     /// - parameter password - tag access password (may be null or empty)
-    func writeAccessPassword(accessPassword: [UInt8], password: [UInt8]?) {
+    public func writeAccessPassword(accessPassword: [UInt8], password: [UInt8]?) {
 		var memoryToWrite = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String
@@ -397,7 +397,7 @@ public class EPC_tag: Tag {
     /// 
     /// - parameter ID -  the new tag ID to write
     /// - parameter NSI - the tag Number System Identifier to write
-    func writeID(ID: [UInt8], NSI: UInt16) {
+    public func writeID(ID: [UInt8], NSI: UInt16) {
 		var numberingSystemIdentifier = [UInt8](repeating: 0, count: 2)
 		var command: String		
 		
@@ -430,7 +430,7 @@ public class EPC_tag: Tag {
     /// 
     /// - parameter kill_password - the new tag kill password (4 bytes)
     /// - parameter password - tag access password (may be null or empty)
-    func writeKillPassword(kill_password: [UInt8], password: [UInt8]?) {
+    public func writeKillPassword(kill_password: [UInt8], password: [UInt8]?) {
         var memoryToWrite = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String

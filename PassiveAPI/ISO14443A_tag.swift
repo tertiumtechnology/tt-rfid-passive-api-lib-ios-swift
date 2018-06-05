@@ -28,11 +28,11 @@ public class ISO14443A_tag: Tag {
 	///
     /// - parameter ID             - the tag ID
     /// - parameter passive_reader - reference to the passive reader object
-	override init(ID: [UInt8], passiveReader: PassiveReader) {
+	public override init(ID: [UInt8], passiveReader: PassiveReader) {
         super.init(ID: ID, passiveReader: passiveReader)
     }
     
-    override func toString() -> String {
+    public override func toString() -> String {
         var tmp: String = ""
 		
 		if (reverseID) {

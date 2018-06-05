@@ -41,7 +41,7 @@ public class Tag {
         self.passiveReader = passiveReader
     }
     
-    func toString() -> String {
+    public func toString() -> String {
         return ""
     }
     
@@ -51,28 +51,28 @@ public class Tag {
 	///
     /// - parameter reverseID - if reverse the tag ID
     /// - returns - the tag id
-    func setReverseID(reverseID: Bool) {
+    public func setReverseID(reverseID: Bool) {
         self.reverseID = reverseID
     }
     
     /// Get the tag ID
     ///
     /// - returns - the tag id
-    func getID() -> [UInt8] {
+    public func getID() -> [UInt8] {
         return ID
     }
     
     /// Set the timeout value for every tag related command
     ///
     /// - parameter timeout - The timeout in milliseconds
-    func setTimeout(timeout: Int) {
+    public func setTimeout(timeout: Int) {
         self.timeout = timeout
     }
     
     /// Get the timeout value
     ///
     /// - returns - the timeout value in milliseconds
-    func getTimeout() -> Int {
+    public func getTimeout() -> Int {
         return timeout
     }
 }

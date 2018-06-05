@@ -39,7 +39,7 @@ public class ISO15693_tag: Tag {
     /// 
     /// - parameter address - the tag memory address
     /// - parameter blocks - the number of memory 4-bytes blocks to lock (1-25)
-    func lock(address: Int, blocks: Int) {
+    public func lock(address: Int, blocks: Int) {
 		var commandBytes = [UInt8](repeating: 0, count: 12)
 		
         if (passiveReader.status != PassiveReader.READY_STATUS) {
@@ -83,7 +83,7 @@ public class ISO15693_tag: Tag {
     /// 
     /// - parameter address - the tag memory address
     /// - parameter blocks - the number of memory 4-byte blocks to read (1-25)
-    func read(address: Int, blocks: Int) {
+    public func read(address: Int, blocks: Int) {
         var commandBytes = [UInt8](repeating: 0, count: 12)
 		
         if (passiveReader.status != PassiveReader.READY_STATUS) {
@@ -120,7 +120,7 @@ public class ISO15693_tag: Tag {
         passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: passiveReader.buildCommand(commandCode: PassiveReader.ISO15693_READ_COMMAND, parameters: commandBytes).data(using: String.Encoding.ascii)!)
     }
 	
-    override func toString() -> String {
+    public override func toString() -> String {
         var tmp: String = ""
 		
 		if (reverseID) {
@@ -143,7 +143,7 @@ public class ISO15693_tag: Tag {
     /// 
     /// - parameter address - the tag memory address
     /// - parameter data - the data bytes to write
-    func write(address: Int, data: [UInt8]) {
+    public func write(address: Int, data: [UInt8]) {
         var commandBytes = [UInt8](repeating: 0, count: 12)
 		
         if (passiveReader.status != PassiveReader.READY_STATUS) {
