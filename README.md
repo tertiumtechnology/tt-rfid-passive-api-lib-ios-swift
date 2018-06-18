@@ -16,3 +16,4 @@ To download full source code for the passive rfid library follow these steps:
 
 ## Note
 The supplied files are ONLY library files. To test the library with an application either build one or use Tertium demo application at https://github.com/tertiumtechnology/tt-rfid-passive-api-testapp-ios-swift
+
