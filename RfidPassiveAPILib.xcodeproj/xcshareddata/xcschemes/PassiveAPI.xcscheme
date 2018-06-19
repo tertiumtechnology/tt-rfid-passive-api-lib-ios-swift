@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7B8A9EC520C6B3B2006F4336"
-               BuildableName = "PassiveAPI.framework"
-               BlueprintName = "PassiveAPI"
-               ReferencedContainer = "container:PassiveAPI.xcodeproj">
+               BuildableName = "RfidPassiveAPILib.framework"
+               BlueprintName = "RfidPassiveAPILib"
+               ReferencedContainer = "container:RfidPassiveAPILib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,9 +46,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7B8A9EC520C6B3B2006F4336"
-            BuildableName = "PassiveAPI.framework"
-            BlueprintName = "PassiveAPI"
-            ReferencedContainer = "container:PassiveAPI.xcodeproj">
+            BuildableName = "RfidPassiveAPILib.framework"
+            BlueprintName = "RfidPassiveAPILib"
+            ReferencedContainer = "container:RfidPassiveAPILib.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -64,9 +64,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7B8A9EC520C6B3B2006F4336"
-            BuildableName = "PassiveAPI.framework"
-            BlueprintName = "PassiveAPI"
-            ReferencedContainer = "container:PassiveAPI.xcodeproj">
+            BuildableName = "RfidPassiveAPILib.framework"
+            BlueprintName = "RfidPassiveAPILib"
+            ReferencedContainer = "container:RfidPassiveAPILib.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
