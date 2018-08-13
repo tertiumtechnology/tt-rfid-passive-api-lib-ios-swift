@@ -1521,16 +1521,41 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                         }
                         inventoryListenerDelegate?.inventoryEvent(tag: tag!)
                     } else if UHFdevice {
-                        if chunk.count > 4 {
-                            var PC: UInt16
-                            
-                            PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
-                            var ID = [UInt8](repeating: 0, count: (chunk.count - 4) / 2)
-                            for n in 0..<ID.count {
-                                ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                        let separator_index = chunk.index(of: " ")
+                        if separator_index == nil {
+                            if chunk.count > 4 {
+                                var PC: UInt16
+                                
+                                PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
+                                var ID = [UInt8](repeating: 0, count: (chunk.count - 4) / 2)
+                                for n in 0..<ID.count {
+                                    ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                                }
+                                tag = EPC_tag(PC: PC, ID: ID, passiveReader: self)
+                                inventoryListenerDelegate?.inventoryEvent(tag: tag!)
                             }
-                            tag = EPC_tag(PC: PC, ID: ID, passiveReader: self)
-                            inventoryListenerDelegate?.inventoryEvent(tag: tag!)
+                        } else {
+                            if chunk.count > 7 {
+                                var PC: UInt16
+                                var ID = [UInt8](repeating: 0, count: (chunk.count - 7) / 2)
+                                var rssi: String
+                                var tmp: Int
+                                
+                                PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
+                                for n in 0..<ID.count {
+                                    ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                                }
+                                rssi = PassiveReader.getStringSubString(str: chunk, start: separator_index!.encodedOffset+1, end: separator_index!.encodedOffset+1+2)
+                                tmp = PassiveReader.hexToWord(hex: rssi)
+                                var RSSI: Int16
+                                if tmp < 127 {
+                                    RSSI = Int16(tmp)
+                                } else {
+                                    RSSI = Int16(tmp - 256)
+                                }
+                                tag = EPC_tag(RSSI: RSSI, PC: PC, ID: ID, passiveReader: self)
+                                inventoryListenerDelegate?.inventoryEvent(tag: tag!)
+                            }
                         }
                     }
                 }

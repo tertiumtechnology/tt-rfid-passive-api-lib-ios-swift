@@ -88,6 +88,7 @@ public class EPC_tag: Tag {
     public static let ACCESSPASSWORD_UNREADABLE_UNWRITABLE: Int = 0x300C0F	
 	
     private let PC: UInt16
+    private let RSSI: Int16
 	
 	/// Class Constructor
 	///
@@ -96,10 +97,23 @@ public class EPC_tag: Tag {
     /// - parameter passiveReader - reference to the passive reader object
     init(PC: UInt16, ID: [UInt8], passiveReader: PassiveReader) {
         self.PC = PC
+        self.RSSI = -128;
         super.init(ID: ID, passiveReader: passiveReader)
     }
     
-	/// Get tag PC + ID.
+    /// Class Constructor
+    ///
+    /// - parameter RSSI - the tag RSSI at inventory time (dBm)
+    /// - parameter PC - the tag PC (Protocol Code)
+    /// - parameter ID - the tag ID
+    /// - parameter passiveReader - reference to the passive reader object
+    init(RSSI: Int16, PC: UInt16, ID: [UInt8], passiveReader: PassiveReader) {
+        self.PC = PC
+        self.RSSI = RSSI;
+        super.init(ID: ID, passiveReader: passiveReader)
+    }
+    
+    /// Get tag PC + ID.
 	///
 	/// - returns - the tag PC + ID as byte array
 	public func getExtendedID() -> [UInt8] {
@@ -120,6 +134,14 @@ public class EPC_tag: Tag {
     public func getPC() -> UInt16 {
         return PC
     }
+    
+    /// Get the tag RSSI at inventory time
+    ///
+    /// - returns - the tag RSSI value in dBm
+    public func getRSSI() -> Int16 {
+        return RSSI;
+    }
+    
     
     /// Start a tag kill operation.
     ///
@@ -371,7 +393,7 @@ public class EPC_tag: Tag {
 		}
 		
 		memoryToWrite[0] = UInt8(EPC_tag.RESERVED_MEMORY_BANK)
-		memoryToWrite[1] = UInt8(EPC_tag.KILL_PASSWORD_ADDRESS)
+		memoryToWrite[1] = UInt8(EPC_tag.ACCESS_PASSWORD_ADDRESS)
 		memoryToWrite[2] = UInt8(2)
 		let tmp = String(format: "%04X", PC)
 		pcNumber[0] = UInt8(timeout / 100)
