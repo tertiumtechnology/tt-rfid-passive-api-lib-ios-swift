@@ -352,7 +352,18 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 	public static func hexToWord(hex: String) -> Int {
 		return Int(strtoul(hex, nil, 16))
 	}
-	
+    
+    public static func hexStringToByte(hex: String) -> [UInt8] {
+        var data = [UInt8](repeating: 0, count: hex.count / 2)
+        
+        for i in 0..<hex.count/2 {
+            let chunk = getStringSubString(str: hex, start: i*2, end: i*2+2)
+            data[i] = UInt8(PassiveReader.hexToWord(hex: chunk))
+        }
+        
+        return data
+    }
+    
 	/// Start a tag encrypted tunnel operation.
 	/// 
 	/// In encrypted tunnel operation the command bytes are directly sent to the
