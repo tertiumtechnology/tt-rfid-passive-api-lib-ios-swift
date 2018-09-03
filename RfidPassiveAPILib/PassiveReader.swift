@@ -325,12 +325,6 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         sequential = 0
         inventoryEnabled = false
         inventoryMode = PassiveReader.NORMAL_MODE
-        
-        // Set appropiate default timeouts for passive devices
-        deviceManager.setTimeOutValue(timeOutValue: 20000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT)
-        deviceManager.setTimeOutValue(timeOutValue: 1000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET)
-        deviceManager.setTimeOutValue(timeOutValue: 2500, timeOutType: TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET)
-        deviceManager.setTimeOutValue(timeOutValue: 300, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS)
     }
     
     public static func bytesToString(bytes: [UInt8]?) -> String {

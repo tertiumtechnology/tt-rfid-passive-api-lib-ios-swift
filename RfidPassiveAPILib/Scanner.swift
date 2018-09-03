@@ -49,6 +49,12 @@ public class Scanner: TxRxDeviceScanProtocol {
     
     init() {
         deviceManager._delegate = self
+        
+        // Set appropiate default timeouts for passive devices
+        deviceManager.setTimeOutValue(timeOutValue: 20000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT)
+        deviceManager.setTimeOutValue(timeOutValue: 1000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET)
+        deviceManager.setTimeOutValue(timeOutValue: 2500, timeOutType: TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET)
+        deviceManager.setTimeOutValue(timeOutValue: 200, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS)
     }
     
     /// Commences the scanning of devices
