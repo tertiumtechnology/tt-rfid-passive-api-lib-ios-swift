@@ -223,7 +223,7 @@ public class EPC_tag: Tag {
     /// - parameter address - the tag memory address
     /// - parameter blocks - the number of memory 2-bytes blocks to read (1-50)
     /// - parameter password - tag access password (may be null or empty)
-    public func read(address: Int, blocks: Int, password: [UInt8]?) {
+    public func read(address: Int, blocks: Int) {
 		var memoryToRead = [UInt8](repeating: 0, count: 3)
 		var pcNumber = [UInt8](repeating: 0, count: 3)
 		var command: String
@@ -258,9 +258,6 @@ public class EPC_tag: Tag {
         command = passiveReader.buildCommand(commandCode: PassiveReader.EPC_READ_COMMAND, parameters: pcNumber)
         command = passiveReader.appendDataToCommand(command: command, data: ID)
         command = passiveReader.appendDataToCommand(command: command, data: memoryToRead)
-        if (password != nil) {
-            command = passiveReader.appendDataToCommand(command: command, data: password!)
-        }
         passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: command.data(using: String.Encoding.ascii)!)
 	}
 	
