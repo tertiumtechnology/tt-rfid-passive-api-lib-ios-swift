@@ -1532,7 +1532,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                         }
                         inventoryListenerDelegate?.inventoryEvent(tag: tag!)
                     } else if UHFdevice {
-                        let separator_index = chunk.index(of: " ")
+                        let separator_index = chunk.firstIndex(of: " ")
                         if separator_index == nil {
                             if chunk.count > 4 {
                                 var PC: UInt16
