@@ -391,7 +391,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         
         status = PassiveReader.PENDING_COMMAND_STATUS
         pending = AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND
-        deviceManager.sendData(device: connectedDevice!, data: buildTunnelCommand(parameters: frame).data(using: String.Encoding.ascii)!)
+        deviceManager.sendData(device: connectedDevice!, data: buildTunnelCommand(encrypted: true, parameters: frame).data(using: String.Encoding.ascii)!)
     }
     
     /// Start an ISO15693 reader tunnel operation.
@@ -409,7 +409,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         
         status = PassiveReader.PENDING_COMMAND_STATUS
         pending = AbstractReaderListener.ISO15693_TUNNEL_COMMAND
-        deviceManager.sendData(device: connectedDevice!, data: buildTunnelCommand(parameters: command).data(using: String.Encoding.ascii)!)
+        deviceManager.sendData(device: connectedDevice!, data: buildTunnelCommand(encrypted: false, parameters: command).data(using: String.Encoding.ascii)!)
     }
     
 	/// Closes the reader driver
@@ -631,7 +631,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         let parameter = [UInt8(PassiveReader.REGISTER_RF_PARAMETERS_FOR_TUNNEL_MODE)]
         status = PassiveReader.PENDING_COMMAND_STATUS
         pending = AbstractReaderListener.GET_RF_FOR_ISO15693_TUNNEL_COMMAND
-        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.EPC_SETREGISTER_COMMAND, parameters: parameter).data(using: String.Encoding.ascii)!)
+        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.ISO15693_SETREGISTER_COMMAND, parameters: parameter).data(using: String.Encoding.ascii)!)
     }
     
     /// Get the configured RF power for HF/UHF reader device.
@@ -986,10 +986,11 @@ public class PassiveReader: TxRxDeviceDataProtocol {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_RF_FOR_ISO15693_TUNNEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
             return
         }
-
+        
+        let parameters = [UInt8(PassiveReader.REGISTER_RF_PARAMETERS_FOR_TUNNEL_MODE), UInt8(timeout), UInt8(delay)];
         status = PassiveReader.PENDING_COMMAND_STATUS
         pending = AbstractReaderListener.SET_RF_FOR_ISO15693_TUNNEL_COMMAND
-        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.ISO15693_SETREGISTER_COMMAND, parameters: [UInt8(timeout), UInt8(delay)]).data(using: String.Encoding.ascii)!)
+        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.ISO15693_SETREGISTER_COMMAND, parameters: parameters).data(using: String.Encoding.ascii)!)
     }
     
     /// Set the RF power for HF/UHF reader device.
@@ -1170,8 +1171,14 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         return command.uppercased()
     }
     
-	internal func buildTunnelCommand(parameters: [UInt8]) -> String {
-		var command: String = "#:"
+    internal func buildTunnelCommand(encrypted: Bool, parameters: [UInt8]) -> String {
+        var command: String;
+        
+        if(encrypted == true) {
+            command = "#:"
+        } else {
+            command = "%:"
+        }
 		
 		for param in parameters {
             command = command + PassiveReader.byteToHex(val: Int(param))
@@ -1512,9 +1519,9 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                 if responseType == "$" {
                     // Command answer
                     answer = ReaderAnswer(answer: chunk)
-                } else if responseType == "#" {
+                } else if responseType == "#" || responseType == "%" {
                     // Tunnel command answer
-                    tunnelAnswer = [UInt8](repeating: 0, count: ((data.count - 2) / 2))
+                    tunnelAnswer = [UInt8](repeating: 0, count: ((chunk.count - 2) / 2))
                     for n in 0..<tunnelAnswer!.count {
                         tunnelAnswer![n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 + 2 * n, end: 2 + 2 * n + 2)))
                     }
@@ -1618,7 +1625,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                 break
             
             case PassiveReader.PENDING_COMMAND_STATUS:
-                if answer!.getSequential() == sequential - 1 {
+                if answer != nil && answer!.getSequential() == sequential - 1 {
                     if answer!.getReturnCode() != PassiveReader.SUCCESSFUL_OPERATION_RETCODE {
                         status = PassiveReader.READY_STATUS
                         if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND {
