@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 Tertium Technology.
+ * Copyright 2017-2021 Tertium Technology.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,24 @@ import TxRxLib
 
 /// Represents the RFID/NFC tag reader
 public class PassiveReader: TxRxDeviceDataProtocol {
-	/// Passive reader internal state constants
+    /// Passive reader internal state constants
 	static internal let ERROR_STATUS: Int = -1
     static internal let NOT_INITIALIZED_STATUS: Int = 0
     static internal let UNINITIALIZED_STATUS: Int = 2
     static internal let READY_STATUS: Int = 3
     static internal let PENDING_COMMAND_STATUS: Int = 4
-	
+    
+    static internal let STREAM_SUBSTATUS = 0
+    static internal let SET_CMD_SUBSTATUS = 1
+    static internal let CMD_SUBSTATUS = 2
+    static internal let SET_STREAM_SUBSTATUS = 3
+    static internal let STREAM_MODE = 1
+    static internal let CMD_MODE = 3
+    
 	/// Passive reader commands
     static public let BEEPER_COMMAND: Int8 = 0x01
     static public let LED_COMMAND: Int8 = 0x02
+    static public let BLE_CONFIG_COMMAND: Int8 = 0x04;
     static public let STATUS_COMMAND: Int8 = 0x05
     static public let MODE_COMMAND: Int8 = 0x06
     static public let SETAUTOOFF_COMMAND: Int8 = 0x0D
@@ -56,6 +64,19 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     static public let ISO15693_SETREGISTER_COMMAND: Int8 = 0x2E
     static public let ISO15693_SETPOWER_COMMAND: Int8 = 0x2F
     static public let ISO14443A_INVENTORY_COMMAND: Int8 = 0x31
+    
+    static public let BLE_DEVICE_NAME = 0x01
+    static public let BLE_SECURITY_LEVEL = 0x02
+    static public let BLE_ADVERTISING_INTERVAL = 0x03
+    static public let BLE_TX_POWER = 0x04
+    static public let BLE_CONNECTION_INTERVAL = 0x05
+    static public let BLE_MAC_ADDRESS = 0x06
+    static public let BLE_SLAVE_LATENCY = 0x07
+    static public let BLE_SUPERVISION_TIMEOUT = 0x08
+    static public let BLE_VERSION = 0x09
+    static public let BLE_USER_MEMORY = 0x0A
+    static public let BLE_FACTORY_DEFAULT = 0xF0
+    static public let BLE_BOOTLOADER = 0xF1
     
     static private let REGISTER_RF_CHANNEL_SELECTION: UInt8 = 0xF0
     static private let REGISTER_BIT_RATE_SELECTION: UInt8 = 0xF1
@@ -78,7 +99,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     private static let _sharedInstance: PassiveReader = PassiveReader()
 	
 	/// TxRxManager instance
-    internal let deviceManager: TxRxManager = TxRxManager.getInstance()
+    internal let deviceManager: TxRxDeviceManager = TxRxDeviceManager.getInstance()
     
     /// TxRxDevice instance, the connected device
     internal var connectedDevice: TxRxDevice?
@@ -87,6 +108,8 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 	public var readerListenerDelegate: AbstractReaderListenerProtocol? = nil
     public var inventoryListenerDelegate: AbstractInventoryListenerProtocol? = nil
     public var responseListenerDelegate: AbstractResponseListenerProtocol? = nil
+    
+    private var command: String? = nil
 	
 	private var inventoryMode = 0, mode: Int = 0
     private var inventoryFeedback = 0, feedback: Int = 0
@@ -102,6 +125,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 	internal var tagID: [UInt8]?
 	
 	internal var status: Int
+    internal var sub_status: Int
     internal var sequential: Int = 0
 	internal var pending: Int = 0
     
@@ -325,6 +349,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         sequential = 0
         inventoryEnabled = false
         inventoryMode = PassiveReader.NORMAL_MODE
+        sub_status = PassiveReader.STREAM_SUBSTATUS
     }
     
     public static func bytesToString(bytes: [UInt8]?) -> String {
@@ -364,7 +389,63 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         return data
     }
     
-	/// Start a tag encrypted tunnel operation.
+    ///
+    /// Get the reader device security level.
+    ///
+    /// Response to the command received via {@link
+    /// AbstractReaderListener#resultEvent(int, int) resultEvent} and {@link AbstractReaderListener#securityLevelEvent(int) securityLevelEvent} methods
+    /// invocation.
+    public func getSecurityLevel() {
+        if (status != PassiveReader.READY_STATUS) {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
+            return;
+        }
+        
+        status = PassiveReader.PENDING_COMMAND_STATUS
+        pending = AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND
+        if (deviceManager.isTxRxAckme(device: connectedDevice!)) {
+            sub_status = PassiveReader.SET_CMD_SUBSTATUS
+            command = "get bl e e"
+            deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.CMD_MODE))
+        } else {
+            let parameters = [UInt8(PassiveReader.BLE_SECURITY_LEVEL)]
+            deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.BLE_CONFIG_COMMAND, parameters: parameters).data(using: String.Encoding.ascii)!)
+        }
+    }
+    
+    ///
+    /// Set the reader device security level.
+    ///
+    /// Response to the command received via {@link
+    /// AbstractReaderListener#resultEvent(int, int) resultEvent} method
+    /// invocation.
+    /// The new security level will be set after a power off/on cycle of the
+    /// reader device.
+    ///
+    /// - parameter level - the new security level
+    public func setSecurityLevel(level: Int) {
+        if (status != PassiveReader.READY_STATUS) {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
+           return
+        }
+        
+        if (deviceManager.isTxRxAckme(device: connectedDevice!)) {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_UNKNOW_COMMAND_ERROR)
+           return
+        }
+        
+        if (level < AbstractReaderListener.BLE_NO_SECURITY || level > AbstractReaderListener.BLE_LESC_LEVEL_2_SECURITY) {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND, error: AbstractReaderListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
+           return
+        }
+        
+        status = PassiveReader.PENDING_COMMAND_STATUS
+        pending = AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND
+        let parameters = [UInt8(PassiveReader.BLE_SECURITY_LEVEL), UInt8(level)]
+        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.BLE_CONFIG_COMMAND, parameters: parameters).data(using: String.Encoding.ascii)!)
+    }
+    
+    /// Start a tag encrypted tunnel operation.
 	/// 
 	/// In encrypted tunnel operation the command bytes are directly sent to the
 	/// reader device.
@@ -373,7 +454,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 	/// methods
 	///
 	/// - parameter flag - flag byte (not encrypted)
-	/// - parameter - command - the command to send to the tag
+	/// - parameter command - the command to send to the tag
 	public func ISO15693encryptedTunnel(flag: UInt8, command: [UInt8]) {
         if status != PassiveReader.READY_STATUS {
             if let readerListenerDelegate = readerListenerDelegate {
@@ -1197,7 +1278,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         status = PassiveReader.ERROR_STATUS
 		connectedDevice = nil
         switch error.code {
-            case TxRxManagerErrors.ErrorCodes.ERROR_DEVICE_CONNECT_TIMED_OUT.rawValue:
+            case TxRxDeviceManagerErrors.ErrorCodes.ERROR_DEVICE_CONNECT_TIMED_OUT.rawValue:
                 readerListenerDelegate?.connectionFailureEvent(error: AbstractReaderListener.READER_CONNECT_TIMEOUT_ERROR)
             
             default:
@@ -1210,6 +1291,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     /// - parameter device: The connected TxRxDevice
     public func deviceConnected(device: TxRxDevice) {
         status = PassiveReader.UNINITIALIZED_STATUS
+        sub_status = PassiveReader.STREAM_SUBSTATUS
     }
     
     /// Informs a connected device is ready to operate and has been identified as a Tertium BLE device
@@ -1218,12 +1300,110 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     public func deviceReady(device: TxRxDevice) {
         connectedDevice = device
         status = PassiveReader.UNINITIALIZED_STATUS
+        sub_status = PassiveReader.STREAM_SUBSTATUS
 		
         //
         deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.SETSTANDARD_COMMAND, parameters: nil).data(using: String.Encoding.ascii)!)
     }
 	
-	func writeTimeoutError() {
+    /// Informs the last setMode characteristic has been found
+    ///
+    /// - parameter device: The TxRxDevice supports setting mode
+    public func setModeCharacteristicDiscovered(device: TxRxDevice) {
+        // call the delegate ?
+    }
+    
+    /// Informs delegate the last setMode operation has succeeded
+    ///
+    /// - parameter device: The TxRxDevice which successfully switched operational mode
+    public func hasSetMode(device: TxRxDevice, operationalMode: UInt) {
+        switch (status) {
+            case PassiveReader.ERROR_STATUS,
+                 PassiveReader.NOT_INITIALIZED_STATUS,
+                 PassiveReader.UNINITIALIZED_STATUS:
+                status = PassiveReader.ERROR_STATUS
+                break
+                
+            case PassiveReader.READY_STATUS:
+                if (operationalMode == PassiveReader.STREAM_MODE) {
+                    sub_status = PassiveReader.STREAM_SUBSTATUS
+                }
+                else {
+                    status = PassiveReader.ERROR_STATUS
+                }
+                break
+                
+            case PassiveReader.PENDING_COMMAND_STATUS:
+                switch (sub_status) {
+                    case PassiveReader.STREAM_SUBSTATUS,
+                         PassiveReader.CMD_SUBSTATUS:
+                        status = PassiveReader.ERROR_STATUS
+                        break
+                        
+                    case PassiveReader.SET_CMD_SUBSTATUS:
+                        if (operationalMode == PassiveReader.CMD_MODE) {
+                            sub_status = PassiveReader.CMD_SUBSTATUS
+                            deviceManager.sendData(device: connectedDevice!, data: (command! + "\r\n").data(using: String.Encoding.ascii)!);
+                        }
+                        else {
+                            status = PassiveReader.ERROR_STATUS
+                        }
+                        break
+                        
+                    case PassiveReader.SET_STREAM_SUBSTATUS:
+                        if (operationalMode == PassiveReader.STREAM_MODE) {
+                            sub_status = PassiveReader.STREAM_SUBSTATUS
+                            status = PassiveReader.READY_STATUS
+                            readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.NO_ERROR)
+                        }
+                        else {
+                            status = PassiveReader.ERROR_STATUS
+                        }
+                        break
+                        
+                    default:
+                        break
+                }
+                break
+        default:
+            break
+        }
+    }
+    
+    public func setModeError(device: TxRxDevice, errorCode: Int) {
+        switch (status) {
+            case PassiveReader.ERROR_STATUS,
+                 PassiveReader.NOT_INITIALIZED_STATUS,
+                 PassiveReader.UNINITIALIZED_STATUS,
+                 PassiveReader.READY_STATUS:
+                 status = PassiveReader.ERROR_STATUS
+                 break
+                
+                case PassiveReader.PENDING_COMMAND_STATUS:
+                    switch (sub_status) {
+                            case PassiveReader.STREAM_SUBSTATUS,
+                                 PassiveReader.CMD_SUBSTATUS,
+                                 PassiveReader.SET_STREAM_SUBSTATUS:
+                            status = PassiveReader.ERROR_STATUS
+                            break
+                        
+                    case PassiveReader.SET_CMD_SUBSTATUS:
+                            status = PassiveReader.READY_STATUS
+                            sub_status = PassiveReader.STREAM_SUBSTATUS
+                            readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_DRIVER_COMMAND_CHANGE_MODE_ERROR)
+                            break
+                    
+                    default:
+                        break
+                    }
+                break
+                    
+        default:
+            break
+        }
+    }
+    
+    func writeTimeoutError() {
 		switch status {
 			case PassiveReader.ERROR_STATUS,
 				 PassiveReader.NOT_INITIALIZED_STATUS,
@@ -1234,7 +1414,13 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 			//case READY_STATUS:
 				
 			case PassiveReader.PENDING_COMMAND_STATUS:
-				if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND) {
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break;
+                }
+                
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND) {
 					readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_WRITE_TIMEOUT_ERROR)
 				} else {
 					switch (pending) {
@@ -1280,7 +1466,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     public func deviceWriteError(device: TxRxDevice, error: NSError) {
 		let errorCode = AbstractReaderListener.READER_WRITE_FAIL_ERROR
 		
-		if error.code == TxRxManagerErrors.ErrorCodes.ERROR_DEVICE_SENDING_DATA_TIMEOUT.rawValue {
+		if error.code == TxRxDeviceManagerErrors.ErrorCodes.ERROR_DEVICE_SENDING_DATA_TIMEOUT.rawValue {
 			writeTimeoutError()
 			return
 		}
@@ -1295,7 +1481,13 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 			//case READY_STATUS:
 			
 			case PassiveReader.PENDING_COMMAND_STATUS:
-				if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND) {
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break;
+                }
+                
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND) {
 					readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
 				} else {
 					switch pending {
@@ -1349,7 +1541,13 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 			
 			// case READY_STATUS:			
 			case PassiveReader.PENDING_COMMAND_STATUS:
-				if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND) {
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break
+                }
+                
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND) {
 					readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_READ_TIMEOUT_ERROR)
 				} else {
 					switch pending {
@@ -1394,11 +1592,11 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     public func deviceReadError(device: TxRxDevice, error: NSError) {
         let errorCode: Int = AbstractReaderListener.READER_READ_FAIL_ERROR
 		
-		if error.code == TxRxManagerErrors.ErrorCodes.ERROR_DEVICE_RECEIVING_DATA_TIMEOUT.rawValue {
+		if error.code == TxRxDeviceManagerErrors.ErrorCodes.ERROR_DEVICE_RECEIVING_DATA_TIMEOUT.rawValue {
 			readNotifyTimeout()
 			return
 		}
-		
+        
 		switch status {
 			case PassiveReader.ERROR_STATUS,
 				 PassiveReader.NOT_INITIALIZED_STATUS,
@@ -1406,10 +1604,14 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 					status = PassiveReader.ERROR_STATUS
                     readerListenerDelegate?.connectionFailureEvent(error: errorCode)
 					
-			//case READY_STATUS
-
             case PassiveReader.PENDING_COMMAND_STATUS:
-				if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND {
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break
+                }
+                
+				if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND {
 					readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
 				} else {
 					switch(pending) {
@@ -1439,8 +1641,8 @@ public class PassiveReader: TxRxDeviceDataProtocol {
 							break
 					}
 				}
-				
 				status = PassiveReader.READY_STATUS
+                break
             
             default:
                 break
@@ -1502,11 +1704,39 @@ public class PassiveReader: TxRxDeviceDataProtocol {
         var answer: ReaderAnswer? = nil
         var tag: Tag?
 
+        if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+            if (data.count == 0) {
+                readerListenerDelegate?.resultEvent(command: pending,
+                                                   error: AbstractReaderListener.READER_DRIVER_COMMAND_CMD_MODE_ANSWER_ERROR)
+            } else {
+                dataString = String(data: data, encoding: .ascii)
+                responseType = PassiveReader.getStringCharAt(str: dataString!, at: 0)
+                if (responseType != ">") {
+                    switch (pending) {
+                        case AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND:
+                            if (responseType == "0") {
+                                readerListenerDelegate?.securityLevelEvent(level: AbstractReaderListener.BLE_NO_SECURITY)
+                            }
+                            else // data.charAt(0) == '1'
+                            {
+                                readerListenerDelegate?.securityLevelEvent(level: AbstractReaderListener.BLE_LEGACY_LEVEL_2_SECURITY)
+                            }
+                            break;
+                    default:
+                        break;
+                    }
+                }
+                sub_status = PassiveReader.SET_STREAM_SUBSTATUS;
+                deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+            }
+            return;
+        }
+        
         if (data.count == 0) {
             status = PassiveReader.READY_STATUS
             return
         }
-        
+
         dataString = String(data: data, encoding: .ascii)
         let splitted = dataString?.components(separatedBy: "\r\n")
         if let splitted = splitted {
@@ -1516,6 +1746,10 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                 }
                 
                 responseType = PassiveReader.getStringCharAt(str: chunk, at: 0)
+                if responseType == "> " {
+                    return
+                }
+                
                 if responseType == "$" {
                     // Command answer
                     answer = ReaderAnswer(answer: chunk)
@@ -1526,7 +1760,16 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                         tunnelAnswer![n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 + 2 * n, end: 2 + 2 * n + 2)))
                     }
                 } else {
-                    // Tag answer
+                    // check for valid ID chars
+                    for n in 0..<chunk.count {
+                        let char = String(chunk[String.Index(utf16Offset: n, in: chunk)])
+                        let charValue = Int(char, radix: 16)
+                        if (charValue == nil || charValue! < 0) {
+                            return
+                        }
+                    }
+                    
+                    // Tag info
                     if HFdevice {
                         var ID = [UInt8](repeating: 0, count: chunk.count / 2)
                         for n in 0..<ID.count {
@@ -1563,7 +1806,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                                 for n in 0..<ID.count {
                                     ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
                                 }
-                                rssi = PassiveReader.getStringSubString(str: chunk, start: separator_index!.encodedOffset+1, end: separator_index!.encodedOffset+1+2)
+                                rssi = PassiveReader.getStringSubString(str: chunk, start: separator_index!.utf16Offset(in: chunk) + 1, end: separator_index!.utf16Offset(in: chunk) + 1 + 2)
                                 tmp = PassiveReader.hexToWord(hex: rssi)
                                 var RSSI: Int16
                                 if tmp < 127 {
@@ -1628,7 +1871,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                 if answer != nil && answer!.getSequential() == sequential - 1 {
                     if answer!.getReturnCode() != PassiveReader.SUCCESSFUL_OPERATION_RETCODE {
                         status = PassiveReader.READY_STATUS
-                        if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ISO15693_ENCRYPTEDTUNNEL_COMMAND {
+                        if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND {
                             readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                         } else {
                             switch pending {
@@ -1671,7 +1914,8 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                              AbstractReaderListener.SET_ISO15693_OPTION_BITS_COMMAND,
                              AbstractReaderListener.SET_ISO15693_EXTENSION_FLAG_COMMAND,
                              AbstractReaderListener.SET_ISO15693_BITRATE_COMMAND,
-                             AbstractReaderListener.SET_EPC_FREQUENCY_COMMAND:
+                             AbstractReaderListener.SET_EPC_FREQUENCY_COMMAND,
+                             AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND:
                             readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                         
                         case AbstractReaderListener.SET_INVENTORY_MODE_COMMAND:
@@ -1791,6 +2035,15 @@ public class PassiveReader: TxRxDeviceDataProtocol {
                                 readerListenerDelegate?.EPCfrequencyEvent(frequency: frequency)
                             }
                         
+                        case AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND:
+                            if (answer!.getReturnCode() == AbstractReaderListener.NO_ERROR &&
+                                    answer!.getData().count > 0) {
+                                let level: Int = Int(answer!.getData()[0])
+                                readerListenerDelegate?.securityLevelEvent(level: level);
+                            }
+                            readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
+                            break;
+                    
                         case AbstractResponseListener.READ_COMMAND:
                             responseListenerDelegate?.readEvent(tagID: tagID, error: answer!.getReturnCode(), data: answer!.getData())
 
@@ -1870,7 +2123,7 @@ public class PassiveReader: TxRxDeviceDataProtocol {
     public func deviceError(device: TxRxDevice, error: NSError) {
         disconnect()
     }
-	
+    	
     // Utility methods
     public static func getStringCharAt(str: String, at: Int) -> String? {
         return PassiveReader.getStringSubString(str: str, start: at, end: at+1)

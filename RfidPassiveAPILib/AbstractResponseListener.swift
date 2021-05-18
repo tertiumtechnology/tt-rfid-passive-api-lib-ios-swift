@@ -99,4 +99,13 @@ public class AbstractResponseListener {
     
     /// Reader driver command wrong parameter error.
     static let READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR: Int = 0x25
+    
+    /// Reader driver command answer mismatch error.
+    static let READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR: Int = 0x26
+    
+    /// Reader driver change-mode error.
+    static let READER_DRIVER_COMMAND_CHANGE_MODE_ERROR: Int = 0x27
+    
+    /// Reader command mode answer error.
+    static let READER_DRIVER_COMMAND_CMD_MODE_ANSWER_ERROR: Int = 0x28
 }

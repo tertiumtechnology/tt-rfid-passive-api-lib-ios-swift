@@ -27,7 +27,7 @@ import TxRxLib
 public class BleSettings
 {
     //
-    private let deviceManager = TxRxManager.getInstance()
+    private let deviceManager = TxRxDeviceManager.getInstance()
     
     // TxRxManager singleton
     private static let _sharedInstance = BleSettings()

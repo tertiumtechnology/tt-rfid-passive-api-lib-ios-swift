@@ -115,4 +115,12 @@ public protocol AbstractReaderListenerProtocol {
     /// ISO15693encryptedTunnel} method invocation to notify result.
     /// @param data  command answer data
     func tunnelEvent(data: [UInt8]?)
+    
+    ///
+    ///I nvoked after a {@link PassiveReader#getSecurityLevel() getSecurityLevel}
+    /// method invocation to notify result.
+    ///
+    /// @param level  the current security level
+    ///
+    func securityLevelEvent(level: Int)
 }

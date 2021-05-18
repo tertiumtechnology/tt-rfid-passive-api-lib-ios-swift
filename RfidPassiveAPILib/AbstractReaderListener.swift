@@ -130,6 +130,16 @@ public class AbstractReaderListener
     /// {@link PassiveReader#isUHF() isUHF} command.
     public static let IS_UHF_COMMAND: Int = 27
     
+    ///
+    /// @link PassiveReader#setSecurityLevel(int) setSecurityLevel} command.
+    ///
+    public static let SET_SECURITY_LEVEL_COMMAND: Int = 28
+    
+    ///
+    /// {@link PassiveReader#getSecurityLevel() getSecurityLevel} command.
+    ///
+    public static let GET_SECURITY_LEVEL_COMMAND: Int = 29
+
     /// Successful command code (no error).
     static let NO_ERROR: Int = 0x00
     
@@ -234,6 +244,36 @@ public class AbstractReaderListener
     /// Reader driver command wrong parameter error.
     static let READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR: Int = 0x25
     
+    ///
+    /// Reader driver command answer mismatch error.
+    ///
+    static let READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR: Int = 0x26
+    
+    ///
+    /// Reader driver change-mode error.
+    ///
+    static let READER_DRIVER_COMMAND_CHANGE_MODE_ERROR: Int = 0x27
+    
+    ///
+    /// Reader command mode answer error.
+    ///
+    static let READER_DRIVER_COMMAND_CMD_MODE_ANSWER_ERROR: Int = 0x28
+    
+    ///
+    /// Reader set-mode error: BLE device error.
+    ///
+    static let READER_SET_MODE_BLE_DEVICE_ERROR: Int = 0x29
+    
+    ///
+    /// Reader set-mode error: invalid MODE characteristic.
+    ///
+    static let READER_SET_MODE_INVALID_CHARACTERISTIC_ERROR: Int = 0x2A
+    
+    ///
+    /// Reader set-mode error: previous operation in progress.
+    ///
+    static let READER_SET_MODE_OPERATION_IN_PROGRESS_ERROR: Int = 0x2B
+
     /// Low battery status
     static let LOW_BATTERY_STATUS: Int = 0x00
     
@@ -357,35 +397,28 @@ public class AbstractReaderListener
     static let ISO15693_OPTION_BITS_WRITE: Int = 0x02
     
     /// ISO15693 tag with option bit for read operations
-     
     static let ISO15693_OPTION_BITS_READ: Int = 0x04
     
     /// ISO15693 tag with option bit for inventory operations
-     
     static let ISO15693_OPTION_BITS_INVENTORY: Int = 0x08
 
     
     /// ISO15693 low bit-rate tag operations
-     
     static let ISO15693_LOW_BITRATE: Int = 0
     
     /// ISO15693 high bit-rate tag operations
-     
     static let ISO15693_HIGH_BITRATE: Int = 1
 
     
     /// UHF reader device RF carrier frequency from 902.75MHz to 927.5MHz
     /// (50 radio channels with frequency hopping)
-     
     static let RF_CARRIER_FROM_902_75_TO_927_5_MHZ: Int = 0x00
     
     /// UHF reader device RF carrier frequency from 915.25MHz to 927.5MHz
     /// (25 radio channels with frequency hopping)
-     
     static let RF_CARRIER_FROM_915_25_TO_927_5_MHZ: Int = 0x01
     
     /// UHF reader device RF carrier frequency 865.7MHz (no frequency hopping)
-     
     static let RF_CARRIER_865_7_MHZ: Int = 0x02
     
     /// UHF reader device RF carrier frequency 866.3MHz (no frequency hopping)
@@ -445,4 +478,19 @@ public class AbstractReaderListener
     /// UHF reader device RF carrier frequency 925.25MHz (no frequency hopping)
      
     static let RF_CARRIER_925_25_MHZ: Int = 0x10
+
+    ///
+    ///BLE security level 1 (no security).
+    ///
+    static let BLE_NO_SECURITY: Int = 0x00
+    
+    ///
+    ///Legacy BLE security level 2.
+    ///
+    static let BLE_LEGACY_LEVEL_2_SECURITY: Int = 0x01
+    
+    ///
+    /// LESC BLE security level 2.
+    ///
+    static let BLE_LESC_LEVEL_2_SECURITY: Int = 0x02
 }

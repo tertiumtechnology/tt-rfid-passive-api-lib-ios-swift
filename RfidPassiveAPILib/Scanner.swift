@@ -27,10 +27,10 @@ import TxRxLib
 /// Performs the scanning of Tertium Ble Devices
 public class Scanner: TxRxDeviceScanProtocol {
     public class Timeouts {
-        public static let S_TERTIUM_TIMEOUT_CONNECT = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT
-        public static let S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET = TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET
-        public static let S_TERTIUM_TIMEOUT_RECEIVE_PACKETS = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS
-        public static let S_TERTIUM_TIMEOUT_SEND_PACKET = TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET
+        public static let S_TERTIUM_TIMEOUT_CONNECT = TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT
+        public static let S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET = TxRxDeviceManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET
+        public static let S_TERTIUM_TIMEOUT_RECEIVE_PACKETS = TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS
+        public static let S_TERTIUM_TIMEOUT_SEND_PACKET = TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET
     }
     
     /// Scanner singleton
@@ -40,7 +40,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     public var delegate: AbstractScanListenerProtocol? = nil
 
     /// TxRxManager instance
-    private let deviceManager: TxRxManager = TxRxManager.getInstance()
+    private let deviceManager: TxRxDeviceManager = TxRxDeviceManager.getInstance()
     
     /// Gets Scanner class singleton instance
     public static func getInstance() -> Scanner {
@@ -51,10 +51,10 @@ public class Scanner: TxRxDeviceScanProtocol {
         deviceManager._delegate = self
         
         // Set appropiate default timeouts for passive devices
-        deviceManager.setTimeOutValue(timeOutValue: 20000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT)
-        deviceManager.setTimeOutValue(timeOutValue: 1000, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET)
-        deviceManager.setTimeOutValue(timeOutValue: 2500, timeOutType: TxRxManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET)
-        deviceManager.setTimeOutValue(timeOutValue: 200, timeOutType: TxRxManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS)
+        deviceManager.setTimeOutValue(timeOutValue: 20000, timeOutType: TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_CONNECT)
+        deviceManager.setTimeOutValue(timeOutValue: 1000, timeOutType: TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_SEND_PACKET)
+        deviceManager.setTimeOutValue(timeOutValue: 2500, timeOutType: TxRxDeviceManagerTimeouts.S_TERITUM_TIMEOUT_RECEIVE_FIRST_PACKET)
+        deviceManager.setTimeOutValue(timeOutValue: 200, timeOutType: TxRxDeviceManagerTimeouts.S_TERTIUM_TIMEOUT_RECEIVE_PACKETS)
     }
     
     /// Commences the scanning of devices
@@ -122,7 +122,7 @@ public class Scanner: TxRxDeviceScanProtocol {
     }
     
     public func deviceScanError(error: NSError) {
-        if error.code == TxRxManagerErrors.ErrorCodes.ERROR_BLUETOOTH_NOT_READY_OR_LOST.rawValue {
+        if error.code == TxRxDeviceManagerErrors.ErrorCodes.ERROR_BLUETOOTH_NOT_READY_OR_LOST.rawValue {
             delegate?.deviceScanErrorEvent(error: AbstractScanListener.READER_DISCONNECT_BLE_NOT_INITIALIZED_ERROR)
             return
         }
