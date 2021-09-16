@@ -23,6 +23,10 @@
 		7B8A9EEB20C6B414006F4336 /* PassiveReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A9EDD20C6B414006F4336 /* PassiveReader.swift */; };
 		7B8A9EEC20C6B414006F4336 /* AbstractScanListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A9EDE20C6B414006F4336 /* AbstractScanListener.swift */; };
 		7B8A9EF420C6B489006F4336 /* TxRxLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8A9EF220C6B47E006F4336 /* TxRxLib.framework */; };
+		92A4950826F3E662002CB9DB /* AbstractZhagaListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A4950526F3E662002CB9DB /* AbstractZhagaListener.swift */; };
+		92A4950926F3E662002CB9DB /* AbstractZhagaListenerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A4950726F3E662002CB9DB /* AbstractZhagaListenerProtocol.swift */; };
+		92A4950C26F3E681002CB9DB /* ZhagaReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A4950A26F3E681002CB9DB /* ZhagaReader.swift */; };
+		92A4950D26F3E681002CB9DB /* ZhagaReaderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A4950B26F3E681002CB9DB /* ZhagaReaderProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +58,10 @@
 		7B8A9EDD20C6B414006F4336 /* PassiveReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PassiveReader.swift; sourceTree = "<group>"; };
 		7B8A9EDE20C6B414006F4336 /* AbstractScanListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractScanListener.swift; sourceTree = "<group>"; };
 		7B8A9EED20C6B47E006F4336 /* TxRxLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = TxRxLib.xcodeproj; path = "tt-txrx-lib-ios-swift/TxRxLib.xcodeproj"; sourceTree = "<group>"; };
+		92A4950526F3E662002CB9DB /* AbstractZhagaListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractZhagaListener.swift; sourceTree = "<group>"; };
+		92A4950726F3E662002CB9DB /* AbstractZhagaListenerProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractZhagaListenerProtocol.swift; sourceTree = "<group>"; };
+		92A4950A26F3E681002CB9DB /* ZhagaReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZhagaReader.swift; sourceTree = "<group>"; };
+		92A4950B26F3E681002CB9DB /* ZhagaReaderProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZhagaReaderProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +97,10 @@
 		7B8A9EC820C6B3B2006F4336 /* RfidPassiveAPILib */ = {
 			isa = PBXGroup;
 			children = (
+				92A4950A26F3E681002CB9DB /* ZhagaReader.swift */,
+				92A4950B26F3E681002CB9DB /* ZhagaReaderProtocol.swift */,
+				92A4950526F3E662002CB9DB /* AbstractZhagaListener.swift */,
+				92A4950726F3E662002CB9DB /* AbstractZhagaListenerProtocol.swift */,
 				7B8A9ED520C6B414006F4336 /* AbstractInventoryListenerProtocol.swift */,
 				7B8A9EDA20C6B414006F4336 /* AbstractReaderListener.swift */,
 				7B8A9ED820C6B414006F4336 /* AbstractReaderListenerProtocol.swift */,
@@ -232,8 +244,12 @@
 				7B8A9EE920C6B414006F4336 /* EPC_tag.swift in Sources */,
 				7B8A9EEC20C6B414006F4336 /* AbstractScanListener.swift in Sources */,
 				7B8A9EE720C6B414006F4336 /* Tag.swift in Sources */,
+				92A4950D26F3E681002CB9DB /* ZhagaReaderProtocol.swift in Sources */,
 				7B8A9EE620C6B414006F4336 /* AbstractReaderListenerProtocol.swift in Sources */,
+				92A4950926F3E662002CB9DB /* AbstractZhagaListenerProtocol.swift in Sources */,
 				7B8A9EE120C6B414006F4336 /* AbstractResponseListenerProtocol.swift in Sources */,
+				92A4950C26F3E681002CB9DB /* ZhagaReader.swift in Sources */,
+				92A4950826F3E662002CB9DB /* AbstractZhagaListener.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

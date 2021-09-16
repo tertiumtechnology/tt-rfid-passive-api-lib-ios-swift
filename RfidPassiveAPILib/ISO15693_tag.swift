@@ -31,50 +31,6 @@ public class ISO15693_tag: Tag {
     override init(ID: [UInt8], passiveReader: PassiveReader) {
         super.init(ID: ID, passiveReader: passiveReader)
     }
-	
-    /// Start a tag lock operation.
-    /// 
-    /// The result of the lock operation is notified invoking response listener method
-    /// AbstractResponseListener.lockEvent([UInt8], Int)
-    /// 
-    /// - parameter address - the tag memory address
-    /// - parameter blocks - the number of memory 4-bytes blocks to lock (1-25)
-    public func lock(address: Int, blocks: Int) {
-		var commandBytes = [UInt8](repeating: 0, count: 12)
-		
-        if (passiveReader.status != PassiveReader.READY_STATUS) {
-            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_WRONG_STATUS_ERROR)
-            return
-        }
-		
-        if (address < 0 || address > 65535) {
-            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
-            return
-        }
-		
-        if (blocks < 0 || blocks > 25) {
-            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
-            return
-        }
-		
-        let tmp = String(format: "%04X", address)
-		commandBytes[0] = UInt8(timeout / 100)
-		commandBytes[1] = ID[0]
-		commandBytes[2] = ID[1]
-		commandBytes[3] = ID[2]
-		commandBytes[4] = ID[3]
-		commandBytes[5] = ID[4]
-		commandBytes[6] = ID[5]
-		commandBytes[7] = ID[6]
-		commandBytes[8] = ID[7]
-		commandBytes[9] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: tmp, start: 0, end: 2)))
-		commandBytes[10] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: tmp, start: 2, end: 4)))
-		commandBytes[11] = UInt8(blocks)
-        passiveReader.status = PassiveReader.PENDING_COMMAND_STATUS
-        passiveReader.pending = AbstractResponseListener.LOCK_COMMAND
-        passiveReader.tagID = getID()
-        passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: passiveReader.buildCommand(commandCode: PassiveReader.ISO15693_LOCK_COMMAND, parameters: commandBytes).data(using: String.Encoding.ascii)!)
-    }
 
     /// Start a tag memory read operation.
     /// 
@@ -118,22 +74,6 @@ public class ISO15693_tag: Tag {
         passiveReader.pending = AbstractResponseListener.READ_COMMAND
         passiveReader.tagID = getID()
         passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: passiveReader.buildCommand(commandCode: PassiveReader.ISO15693_READ_COMMAND, parameters: commandBytes).data(using: String.Encoding.ascii)!)
-    }
-	
-    public override func toString() -> String {
-        var tmp: String = ""
-		
-		if (reverseID) {
-			for n in stride(from: ID.count, to: 0, by: -1) {
-				tmp = tmp + PassiveReader.byteToHex(val: Int(ID[n]))
-			}
-		} else {
-			for n in 0..<ID.count {
-				tmp = tmp + PassiveReader.byteToHex(val: Int(ID[n]))
-			}
-		}
-		
-		return tmp
     }
 	
 	/// Start a tag memory write operation.
@@ -180,5 +120,65 @@ public class ISO15693_tag: Tag {
         var command: String = passiveReader.buildCommand(commandCode: PassiveReader.ISO15693_WRITE_COMMAND, parameters: commandBytes);
         command = passiveReader.appendDataToCommand(command: command, data: data);
         passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: command.data(using: String.Encoding.ascii)!)
+    }
+    
+    /// Start a tag lock operation.
+    ///
+    /// The result of the lock operation is notified invoking response listener method
+    /// AbstractResponseListener.lockEvent([UInt8], Int)
+    ///
+    /// - parameter address - the tag memory address
+    /// - parameter blocks - the number of memory 4-bytes blocks to lock (1-25)
+    public func lock(address: Int, blocks: Int) {
+        var commandBytes = [UInt8](repeating: 0, count: 12)
+        
+        if (passiveReader.status != PassiveReader.READY_STATUS) {
+            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_WRONG_STATUS_ERROR)
+            return
+        }
+        
+        if (address < 0 || address > 65535) {
+            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
+            return
+        }
+        
+        if (blocks < 0 || blocks > 25) {
+            passiveReader.responseListenerDelegate?.lockEvent(tagID: getID(), error: AbstractResponseListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
+            return
+        }
+        
+        let tmp = String(format: "%04X", address)
+        commandBytes[0] = UInt8(timeout / 100)
+        commandBytes[1] = ID[0]
+        commandBytes[2] = ID[1]
+        commandBytes[3] = ID[2]
+        commandBytes[4] = ID[3]
+        commandBytes[5] = ID[4]
+        commandBytes[6] = ID[5]
+        commandBytes[7] = ID[6]
+        commandBytes[8] = ID[7]
+        commandBytes[9] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: tmp, start: 0, end: 2)))
+        commandBytes[10] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: tmp, start: 2, end: 4)))
+        commandBytes[11] = UInt8(blocks)
+        passiveReader.status = PassiveReader.PENDING_COMMAND_STATUS
+        passiveReader.pending = AbstractResponseListener.LOCK_COMMAND
+        passiveReader.tagID = getID()
+        passiveReader.deviceManager.sendData(device: passiveReader.connectedDevice!, data: passiveReader.buildCommand(commandCode: PassiveReader.ISO15693_LOCK_COMMAND, parameters: commandBytes).data(using: String.Encoding.ascii)!)
+    }
+    
+    public override func toString() -> String {
+        var tmp: String = ""
+        
+        if (reverseID) {
+            for n in stride(from: ID.count, to: 0, by: -1) {
+                tmp = tmp + PassiveReader.byteToHex(val: Int(ID[n]))
+            }
+        } else {
+            for n in 0..<ID.count {
+                tmp = tmp + PassiveReader.byteToHex(val: Int(ID[n]))
+            }
+        }
+        
+        return tmp
     }
 }

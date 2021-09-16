@@ -139,7 +139,218 @@ public class AbstractReaderListener
     /// {@link PassiveReader#getSecurityLevel() getSecurityLevel} command.
     ///
     public static let GET_SECURITY_LEVEL_COMMAND: Int = 29
+    
+    /**
+     * {@link PassiveReader#setName(String) setName} command.
+     */
+    public static let SET_DEVICE_NAME_COMMAND: Int = 30
+    /**
+     * {@link PassiveReader#getName() getName} command.
+     */
+    public static let GET_DEVICE_NAME_COMMAND: Int = 31
+    /**
+     * {@link PassiveReader#setAdvertisingInterval(int) setAdvertisingInterval} command.
+     */
+    public static let SET_ADVERTISING_INTERVAL_COMMAND: Int = 32
+    /**
+     * {@link PassiveReader#getAdvertisingInterval() getAdvertisingInterval} command.
+     */
+    public static let GET_ADVERTISING_INTERVAL_COMMAND: Int = 33
+    /**
+     * {@link PassiveReader#setBLEpower(int) setBLEpower} command.
+     */
+    public static let SET_BLE_POWER_COMMAND: Int = 34
+    /**
+     * {@link PassiveReader#getBLEpower() getBLEpower} command.
+     */
+    public static let GET_BLE_POWER_COMMAND: Int = 35
+    /**
+     * {@link PassiveReader#setConnectionInterval(float, float) setConnectionInterval} command.
+     */
+    public static let SET_CONNECTION_INTERVAL_COMMAND: Int = 36
+    /**
+     * {@link PassiveReader#getConnectionInterval() getConnectionInterval} command.
+     */
+    public static let GET_CONNECTION_INTERVAL_COMMAND: Int = 37
+    /**
+     * {@link PassiveReader#getConnectionIntervalAndMTU() getConnectionIntervalAndMTU} command.
+     */
+    public static let GET_CONNECTION_INTERVAL_AND_MTU_COMMAND: Int = 38
+    /**
+     * {@link PassiveReader#getMACaddress() getMACaddress} command.
+     */
+    public static let GET_MAC_ADDRESS_COMMAND: Int = 39
+    /**
+     * {@link PassiveReader#setSlaveLatency(int) setSlaveLatency} command.
+     */
+    public static let SET_SLAVE_LATENCY_COMMAND: Int = 40
+    /**
+     * {@link PassiveReader#getSlaveLatency() getSlaveLatency} command.
+     */
+    public static let GET_SLAVE_LATENCY_COMMAND: Int = 41
+    /**
+     * {@link PassiveReader#setSupervisionTimeout(int) setSupervisionTimeout} command.
+     */
+    public static let SET_SUPERVISION_TIMEOUT_COMMAND: Int = 42
+    /**
+     * {@link PassiveReader#getSupervisionTimeout() getSupervisionTimeout} command.
+     */
+    public static let GET_SUPERVISION_TIMEOUT_COMMAND: Int = 43
+    /**
+     * {@link PassiveReader#getBLEfirmwareVersion() getBLEfirmwareVersion} command.
+     */
+    public static let GET_BLE_FIRMWARE_VERSION_COMMAND: Int = 44
+    /**
+     * {@link PassiveReader#readUserMemory(int) readUserMemory} command.
+     */
+    public static let READ_USER_MEMORY_COMMAND: Int = 45
+    /**
+     * {@link PassiveReader#writeUserMemory(int, byte[]) writeUserMemory} command.
+     */
+    public static let WRITE_USER_MEMORY_COMMAND: Int = 46
 
+    /**
+    * {@link PassiveReader#defaultSetup() defaultSetup} command.
+     */
+   public static let DEFAULT_SETUP_COMMAND: Int = 47
+    
+    /**
+     * {@link PassiveReader#reset(boolean) reset} command.
+     */
+    public static let RESET_COMMAND: Int = 48
+    /**
+     * {@link PassiveReader#defaultBLEconfiguration(int, boolean) defaultBLEconfiguration} command.
+     */
+    public static let DEFAULT_BLE_CONFIGURATION_COMMAND: Int = 49
+    /**
+     * {@link PassiveReader#setHMI(int, int, int, int, int, int, int, int, int, int, int) setHMI} command.
+     */
+    public static let ZHAGA_GET_HMI_SUPPORT_COMMAND: Int = 50
+    /**
+     * {@link PassiveReader#setHMI(int, int, int, int, int, int, int, int, int, int, int) setHMI} command.
+     */
+    public static let ZHAGA_SET_HMI_COMMAND: Int = 51
+    /**
+     * {@link PassiveReader#setRF(boolean) setHMI} command.
+     */
+    public static let ZHAGA_SET_RF_COMMAND: Int = 52
+    /**
+     * {@link PassiveReader#getRF() getRF} command.
+     */
+    public static let ZHAGA_GET_RF_COMMAND: Int = 53
+    /**
+     * {@link PassiveReader#off() off} command.
+     */
+    public static let ZHAGA_OFF_COMMAND: Int = 54
+    /**
+     * {@link PassiveReader#reboot() reboot} command.
+     */
+    public static let ZHAGA_REBOOT_COMMAND: Int = 55
+    /**
+     * {@link PassiveReader#setSoundForInventory(int, int, int, int) setSoundForInventory} command.
+     */
+    public static let ZHAGA_SET_INVENTORY_SOUND_COMMAND: Int = 56
+    /**
+     * {@link PassiveReader#getSoundForInventory() getSoundForInventory} command.
+     */
+    public static let ZHAGA_GET_INVENTORY_SOUND_COMMAND: Int = 57
+    /**
+     * {@link PassiveReader#setSoundForCommand(int, int, int, int) setSoundForCommand} command.
+     */
+    public static let ZHAGA_SET_COMMAND_SOUND_COMMAND: Int = 58
+    /**
+     * {@link PassiveReader#getSoundForCommand() getSoundForCommand} command.
+     */
+    public static let ZHAGA_GET_COMMAND_SOUND_COMMAND: Int = 59
+    /**
+     * {@link PassiveReader#setSoundForError(int, int, int, int) setSoundForError} command.
+     */
+    public static let ZHAGA_SET_ERROR_SOUND_COMMAND: Int = 60
+    /**
+     * {@link PassiveReader#getSoundForError() getSoundForError} command.
+     */
+    public static let ZHAGA_GET_ERROR_SOUND_COMMAND: Int = 61
+    /**
+     * {@link PassiveReader#setLEDforInventory(int, int, int, int) setLEDforInventory} command.
+     */
+    public static let ZHAGA_SET_INVENTORY_LED_COMMAND: Int = 62
+    /**
+     * {@link PassiveReader#getLEDforInventory() getLEDforInventory} command.
+     */
+    public static let ZHAGA_GET_INVENTORY_LED_COMMAND: Int = 63
+    /**
+     * {@link PassiveReader#setLEDforCommand(int, int, int, int) setLEDforCommand} command.
+     */
+    public static let ZHAGA_SET_COMMAND_LED_COMMAND: Int = 64
+    /**
+     * {@link PassiveReader#getLEDforCommand() getLEDforCommand} command.
+     */
+    public static let ZHAGA_GET_COMMAND_LED_COMMAND: Int = 65
+    /**
+     * {@link PassiveReader#setLEDforError(int, int, int, int) setLEDforError} command.
+     */
+    public static let ZHAGA_SET_ERROR_LED_COMMAND: Int = 66
+    /**
+     * {@link PassiveReader#getLEDforError() getLEDforError} command.
+     */
+    public static let ZHAGA_GET_ERROR_LED_COMMAND: Int = 67
+    /**
+     * {@link PassiveReader#setVibrationForInventory(int, int, int) setVibrationForInventory} command.
+     */
+    public static let ZHAGA_SET_INVENTORY_VIBRATION_COMMAND: Int = 68
+    /**
+     * {@link PassiveReader#getVibrationForInventory() getVibrationForInventory} command.
+     */
+    public static let ZHAGA_GET_INVENTORY_VIBRATION_COMMAND: Int = 69
+    /**
+     * {@link PassiveReader#setVibrationForCommand(int, int, int) setVibrationForCommand} command.
+     */
+    public static let ZHAGA_SET_COMMAND_VIBRATION_COMMAND: Int = 70
+    /**
+     * {@link PassiveReader#getVibrationForCommand() getVibrationForCommand} command.
+     */
+    public static let ZHAGA_GET_COMMAND_VIBRATION_COMMAND: Int = 71
+    /**
+     * {@link PassiveReader#setVibrationForError(int, int, int) setVibrationForError} command.
+     */
+    public static let ZHAGA_SET_ERROR_VIBRATION_COMMAND: Int = 73
+    /**
+     * {@link PassiveReader#getVibrationForError() getVibrationForError} command.
+     */
+    public static let ZHAGA_GET_ERROR_VIBRATION_COMMAND: Int = 73
+    /**
+     * {@link PassiveReader#activateButton(int) activateButton} command.
+     */
+    public static let ZHAGA_ACTIVATE_BUTTON_COMMAND: Int = 74
+    /**
+     * {@link PassiveReader#getActivatedButton() getActivatedButton} command.
+     */
+    public static let ZHAGA_GET_ACTIVATED_BUTTON_COMMAND: Int = 75
+    /**
+     * {@link PassiveReader#setRFonOff(int, int, int) setRFonOff} command.
+     */
+    public static let ZHAGA_SET_RF_ONOFF_COMMAND: Int = 76
+    /**
+     * {@link PassiveReader#getRFonOff() getRFonOff} command.
+     */
+    public static let ZHAGA_GET_RF_ONOFF_COMMAND: Int = 77
+    /**
+     * {@link PassiveReader#setAutoOff(int) setAutoOff} command.
+     */
+    public static let ZHAGA_SET_AUTOOFF_COMMAND: Int = 78
+    /**
+     * {@link PassiveReader#getAutoOff() getAutoOff} command.
+     */
+    public static let ZHAGA_GET_AUTOOFF_COMMAND: Int = 79
+    /**
+     * {@link PassiveReader#defaultConfiguration() defaultConfiguration} command.
+     */
+    public static let ZHAGA_DEFAULT_CONFIG_COMMAND: Int = 80
+    /**
+     * {@link PassiveReader#transparent(byte[]) transparent} command.
+     */
+    public static let ZHAGA_TRANSPARENT_COMMAND: Int = 81
+    
     /// Successful command code (no error).
     static let NO_ERROR: Int = 0x00
     
@@ -273,6 +484,11 @@ public class AbstractReaderListener
     /// Reader set-mode error: previous operation in progress.
     ///
     static let READER_SET_MODE_OPERATION_IN_PROGRESS_ERROR: Int = 0x2B
+
+    ///
+    /// Reader answer wrong format error code.
+    ///
+    public static let READER_ANSWER_WRONG_FORMAT_ERROR: Int = 0x2C
 
     /// Low battery status
     static let LOW_BATTERY_STATUS: Int = 0x00
@@ -493,4 +709,61 @@ public class AbstractReaderListener
     /// LESC BLE security level 2.
     ///
     static let BLE_LESC_LEVEL_2_SECURITY: Int = 0x02
+    
+    ///
+    ///BLE advertising -40dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_40_DBM: Int = 0x00
+    ///
+    ///BLE advertising -20dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_20_DBM: Int = 0x01
+    ///
+    ///BLE advertising -16dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_16_DBM: Int = 0x02
+    ///
+    ///BLE advertising -12dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_12_DBM: Int = 0x03
+    ///
+    ///BLE advertising -8dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_8_DBM: Int = 0x04
+    ///
+    ///BLE advertising -4dBm TX power
+    ///
+    static let BLE_TX_POWER_MINUS_4_DBM: Int = 0x05
+    ///
+    ///BLE advertising 0dBm TX power
+    ///
+    static let BLE_TX_POWER_0_DBM: Int = 0x06
+    ///
+    ///BLE advertising +2dBm TX power
+    ///
+    static let BLE_TX_POWER_2_DBM: Int = 0x07
+    ///
+    ///BLE advertising +3dBm TX power
+    ///
+    static let BLE_TX_POWER_3_DBM: Int = 0x08
+    ///
+    ///BLE advertising +4dBm TX power
+    ///
+    static let BLE_TX_POWER_4_DBM: Int = 0x09
+    ///
+    ///BLE advertising +5dBm TX power
+    ///
+    static let BLE_TX_POWER_5_DBM: Int = 0x0A
+    ///
+    ///BLE advertising +6dBm TX power
+    ///
+    static let BLE_TX_POWER_6_DBM: Int = 0x0B
+    ///
+    ///BLE advertising +7dBm TX power
+    ///
+    static let BLE_TX_POWER_7_DBM: Int = 0x0C
+    ///
+    ///BLE advertising +8dBm TX power
+    ///
+    static let BLE_TX_POWER_8_DBM: Int = 0x0D
 }

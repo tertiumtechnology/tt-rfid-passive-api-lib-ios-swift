@@ -33,7 +33,7 @@ public protocol AbstractReaderListenerProtocol {
     /// to notify failure.
     /// 
     /// @param error error code
-    func connectionFailureEvent(error: Int)
+    func connectionFailedEvent(error: Int)
 	
     /// Invoked after a {@link PassiveReader#connect(String, android.content.Context)} method invocation
     /// to notify success.
@@ -117,10 +117,93 @@ public protocol AbstractReaderListenerProtocol {
     func tunnelEvent(data: [UInt8]?)
     
     ///
-    ///I nvoked after a {@link PassiveReader#getSecurityLevel() getSecurityLevel}
+    /// Invoked after a {@link PassiveReader#getSecurityLevel() getSecurityLevel}
     /// method invocation to notify result.
     ///
     /// @param level  the current security level
     ///
     func securityLevelEvent(level: Int)
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getName() getName}
+    /// method invocation to notify result.
+    ///
+    /// @param device_name  the reader name
+    ///
+    func nameEvent(device_name: String);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getAdvertisingInterval() getAdvertisingInterval}
+    /// method invocation to notify result.
+    ///
+    /// @param advertising_interval the BLE advertising interval (ms)
+    ///
+    func advertisingIntervalEvent(advertising_interval: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getBLEpower() getBLEpower}
+    /// method invocation to notify result.
+    ///
+    /// @param BLE_power the BLE advertising TX power
+    ///
+    func BLEpowerEvent(BLE_power: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getConnectionInterval() getConnectionInterval}
+    /// method invocation to notify result.
+    ///
+    /// @param min_interval  the BLE connection interval minimum value (ms)
+    /// @param max_interval  the BLE connection interval maximum value (ms)
+    ///
+    func connectionIntervalEvent(min_interval: Float, max_interval: Float);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getConnectionIntervalAndMTU() getConnectionIntervalAndMTU}
+    /// method invocation to notify result.
+    ///
+    /// @param connection_interval  the BLE negoziated connection interval value (ms)
+    /// @param MTU  the BLE negoziated MTU (byte)
+    ///
+    func connectionIntervalAndMTUevent(connection_interval: Float, MTU: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getMACaddress() getMACaddress}
+    /// method invocation to notify result.
+    ///
+    /// @param MAC_address  the BLE device MAC address (6-byte array)
+    ///
+    func MACaddressEvent(MAC_address: [UInt8]?);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getSlaveLatency() getSlaveLatency}
+    /// method invocation to notify result.
+    ///
+    /// @param slave_latency the BLE slave latency value
+    ///
+    func slaveLatencyEvent(slave_latency: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getSupervisionTimeout() getSupervisionTimeout}
+    /// method invocation to notify result.
+    ///
+    /// @param supervision_timeout the BLE supervision timeout value (ms)
+    ///
+    func supervisionTimeoutEvent(supervision_timeout: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#getBLEfirmwareVersion()
+    /// getBLEfirmwareVersion} method invocation to notify result.
+    ///
+    /// @param major  the BLE MCU firmware version major number
+    /// @param minor  the BLE MCU firmware version minor number
+    ///
+    func BLEfirmwareVersionEvent(major: Int, minor: Int);
+    
+    ///
+    /// Invoked after a {@link PassiveReader#readUserMemory(int) readUserMemory}
+    /// method invocation to notify result.
+    ///
+    /// @param data_block  the user memory data-block (64-byte array)
+    ///
+    func userMemoryEvent(data_block: [UInt8]?);
 }
