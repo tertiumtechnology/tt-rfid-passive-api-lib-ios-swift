@@ -615,10 +615,23 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         sub_status = PassiveReader.STREAM_SUBSTATUS
         
         // REMOVE
-        print("deviceReady()\n")
+        //print("deviceReady()\n")
+        
+        if (deviceManager.isTxRxZhaga(device: connectedDevice!)) {
+            status = PassiveReader.READY_STATUS;
+            sub_status = PassiveReader.STREAM_SUBSTATUS
+            HFdevice = true
+            UHFdevice = false
+            inventoryStandard = PassiveReader.ISO15693_STANDARD // ?
+            readerListenerDelegate?.connectionSuccessEvent()
+            zhagaListenerDelegate?.connectionSuccessEvent()
+        } else {
+            status = PassiveReader.UNINITIALIZED_STATUS;
+            sub_status = PassiveReader.STREAM_SUBSTATUS;
+            deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.SETSTANDARD_COMMAND, parameters: nil).data(using: String.Encoding.ascii)!)
+        }
 
         //
-        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.SETSTANDARD_COMMAND, parameters: nil).data(using: String.Encoding.ascii)!)
     }
     
     /// The last sendData operation has succeeded
