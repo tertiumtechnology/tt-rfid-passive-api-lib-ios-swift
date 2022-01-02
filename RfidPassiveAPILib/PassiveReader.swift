@@ -208,6 +208,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
     private var HFdevice: Bool = false
     private var UHFdevice: Bool = false
     private var inventoryEnabled: Bool = false
+    private var zhagaDevice: Bool = false
 	
 	internal var tagID: [UInt8]?
 	
@@ -427,14 +428,17 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
     public static let RF_CARRIER_925_25_MHZ:Int = 0x10
 	
     public static func getInstance() -> PassiveReader {
+        _sharedInstance.zhagaDevice = false
         return PassiveReader._sharedInstance
     }
     
     public static func getPassiveReaderInstance() -> PassiveReader {
+        _sharedInstance.zhagaDevice = false
         return PassiveReader._sharedInstance
     }
     
     public static func getZhagaReaderInstance() -> ZhagaReaderProtocol {
+        _sharedInstance.zhagaDevice = true
         return PassiveReader._sharedInstance
     }
     
@@ -617,7 +621,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         // REMOVE
         //print("deviceReady()\n")
         
-        if (deviceManager.isTxRxZhaga(device: connectedDevice!)) {
+        if (zhagaDevice == true) {
             status = PassiveReader.READY_STATUS;
             sub_status = PassiveReader.STREAM_SUBSTATUS
             HFdevice = true
@@ -893,7 +897,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         var tag: Tag?
         
         // REMOVE
-        print("receivedData()\n")
+        //print("receivedData()\n")
 
         if (sub_status == PassiveReader.CMD_SUBSTATUS) {
             if (data.count == 0) {
@@ -952,7 +956,6 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
             return
         }
         
-        // TODO: il device risponde ora solo con \r o \n
         dataString = String(data: data, encoding: .ascii)
         let splitSet = CharacterSet(arrayLiteral: "\r", "\n");
         let splitted = dataString?.components(separatedBy: splitSet)
@@ -1677,9 +1680,36 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                         readerListenerDelegate?.tunnelEvent(data: tunnelAnswer)
                     } else {
                         // answer mismatch
-                        //readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_COMMAND_ANSWER_MISMATCH_ERROR)
-                        //zhagaListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_COMMAND_ANSWER_MISMATCH_ERROR)
-                        resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_COMMAND_ANSWER_MISMATCH_ERROR)
+                        if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.SET_INVENTORY_TYPE_COMMAND) {
+                            resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+                        } else {
+                            switch (pending) {
+                                case AbstractResponseListener.READ_COMMAND:
+                                    responseListenerDelegate?.readEvent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR, data: nil);
+
+                                case AbstractResponseListener.WRITE_COMMAND:
+                                        responseListenerDelegate?.writeEvent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+
+                                case AbstractResponseListener.LOCK_COMMAND:
+                                        responseListenerDelegate?.lockEvent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+
+                                case AbstractResponseListener.WRITEID_COMMAND:
+                                        responseListenerDelegate?.writeIDevent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+
+                                case AbstractResponseListener.READ_TID_COMMAND:
+                                    responseListenerDelegate?.readTIDevent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR, TID: nil);
+
+                                case AbstractResponseListener.KILL_COMMAND:
+                                        responseListenerDelegate?.killEvent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+
+                                case AbstractResponseListener.WRITEKILLPASSWORD_COMMAND,
+                                         AbstractResponseListener.WRITEACCESSPASSWORD_COMMAND:
+                                        responseListenerDelegate?.writePasswordEvent(tagID: tagID, error: AbstractResponseListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
+                                    
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
                 
