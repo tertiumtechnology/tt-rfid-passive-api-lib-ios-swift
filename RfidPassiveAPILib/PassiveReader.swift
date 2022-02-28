@@ -2647,8 +2647,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
             zhagaListenerDelegate?.resultEvent(command: AbstractZhagaListener.DEFAULT_BLE_CONFIGURATION_COMMAND, error: AbstractZhagaListener.READER_DRIVER_WRONG_STATUS_ERROR)
            return
         }
-    
-        if (UHFdevice) {
+        
+        if (deviceManager.isTxRxAckme(device: connectedDevice!)) {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.DEFAULT_BLE_CONFIGURATION_COMMAND, error: AbstractReaderListener.READER_DRIVER_UNKNOW_COMMAND_ERROR)
             zhagaListenerDelegate?.resultEvent(command: AbstractZhagaListener.DEFAULT_BLE_CONFIGURATION_COMMAND, error: AbstractZhagaListener.READER_DRIVER_UNKNOW_COMMAND_ERROR)
             return
