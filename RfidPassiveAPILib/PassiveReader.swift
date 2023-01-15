@@ -196,7 +196,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
     public var inventoryListenerDelegate: AbstractInventoryListenerProtocol? = nil
     public var responseListenerDelegate: AbstractResponseListenerProtocol? = nil
     
-    private var command: String? = nil
+    private var cmdModeCommand: String? = nil
 	
 	private var inventoryMode = 0, mode: Int = 0
     private var inventoryFeedback = 0, feedback: Int = 0
@@ -699,7 +699,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     case PassiveReader.SET_CMD_SUBSTATUS:
                         if (operationalMode == PassiveReader.CMD_MODE) {
                             sub_status = PassiveReader.CMD_SUBSTATUS
-                            deviceManager.sendData(device: connectedDevice!, data: (command! + "\r\n").data(using: String.Encoding.ascii)!);
+                            deviceManager.sendData(device: connectedDevice!, data: (cmdModeCommand! + "\r\n").data(using: String.Encoding.ascii)!);
                         }
                         else {
                             status = PassiveReader.ERROR_STATUS
@@ -727,7 +727,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         }
     }
     
-    public func setModeError(device: TxRxDevice, errorCode: Int) {
+    public func setModeError(device: TxRxDevice, error: NSError) {
         switch (status) {
             case PassiveReader.ERROR_STATUS,
                  PassiveReader.NOT_INITIALIZED_STATUS,
@@ -760,8 +760,42 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
             break
         }
     }
-        
-    func writeTimeoutError() {
+    
+    public func setModeTimeout(device: TxRxDevice) {
+        switch (status) {
+            case PassiveReader.ERROR_STATUS,
+                PassiveReader.NOT_INITIALIZED_STATUS,
+                PassiveReader.UNINITIALIZED_STATUS,
+                PassiveReader.READY_STATUS:
+                status = PassiveReader.ERROR_STATUS
+                break
+            
+            case PassiveReader.PENDING_COMMAND_STATUS:
+                switch (sub_status) {
+                    case PassiveReader.STREAM_SUBSTATUS,
+                            PassiveReader.CMD_SUBSTATUS,
+                            PassiveReader.SET_STREAM_SUBSTATUS:
+                            status = PassiveReader.ERROR_STATUS
+                            break
+                        
+                    case PassiveReader.SET_CMD_SUBSTATUS:
+                            status = PassiveReader.READY_STATUS;
+                            sub_status = PassiveReader.STREAM_SUBSTATUS;
+                            resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_DRIVER_COMMAND_CHANGE_MODE_ERROR)
+                            break
+                    default:
+                        break
+                }
+            
+                break
+            
+            default:
+                break
+        }
+    }
+
+    public func deviceWriteTimeout(device: TxRxDevice) {
+        //print("writeTimeoutError")
         switch status {
             case PassiveReader.ERROR_STATUS,
                  PassiveReader.NOT_INITIALIZED_STATUS,
@@ -769,9 +803,9 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     status = PassiveReader.ERROR_STATUS
                     readerListenerDelegate?.connectionFailedEvent(error: AbstractResponseListener.READER_WRITE_TIMEOUT_ERROR)
                     zhagaListenerDelegate?.connectionFailedEvent(error: AbstractResponseListener.READER_WRITE_TIMEOUT_ERROR)
-                
+            
             //case READY_STATUS:
-                
+            
             case PassiveReader.PENDING_COMMAND_STATUS:
                 if (sub_status == PassiveReader.CMD_SUBSTATUS) {
                     sub_status = PassiveReader.SET_STREAM_SUBSTATUS
@@ -823,7 +857,9 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         }
     }
     
-    public func readTimeoutError() {
+    public func deviceReadTimeout(device: TxRxDevice) {
+        //print("readTimeoutError")
+
         switch status {
             case PassiveReader.ERROR_STATUS,
                  PassiveReader.NOT_INITIALIZED_STATUS,
@@ -883,6 +919,140 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         }
     }
     
+    /// There has been an error receiving data from device
+    ///
+    /// - parameter device: The TxRxDevice on which the error occoured
+    /// - parameter error: An NSError class instance describing the error
+    public func deviceReadError(device: TxRxDevice, error: NSError) {
+        let errorCode: Int = AbstractReaderListener.READER_READ_FAIL_ERROR
+        
+        //print("deviceReadError")
+        switch status {
+            case PassiveReader.ERROR_STATUS,
+                 PassiveReader.NOT_INITIALIZED_STATUS,
+                 PassiveReader.UNINITIALIZED_STATUS:
+                    status = PassiveReader.ERROR_STATUS
+                    readerListenerDelegate?.connectionFailedEvent(error: errorCode)
+                    zhagaListenerDelegate?.connectionFailedEvent(error: errorCode)
+
+            case PassiveReader.PENDING_COMMAND_STATUS:
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break
+                }
+                
+                if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND {
+                    //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                    //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                    resultEvent(command_code: pending, error_code: errorCode)
+                } else {
+                    switch(pending) {
+                        case AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND:
+                            zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                            
+                        case AbstractResponseListener.READ_COMMAND:
+                            responseListenerDelegate?.readEvent(tagID: tagID, error: errorCode, data: nil)
+                            
+                        case AbstractResponseListener.WRITE_COMMAND:
+                            responseListenerDelegate?.writeEvent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.LOCK_COMMAND:
+                            responseListenerDelegate?.lockEvent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.WRITEID_COMMAND:
+                            responseListenerDelegate?.writeIDevent(tagID: tagID, error: errorCode)
+
+                        case AbstractResponseListener.READ_TID_COMMAND:
+                            responseListenerDelegate?.readTIDevent(tagID: tagID, error: errorCode, TID: nil)
+
+                        case AbstractResponseListener.KILL_COMMAND:
+                            responseListenerDelegate?.killEvent(tagID: tagID, error: errorCode)
+
+                        case AbstractResponseListener.WRITEKILLPASSWORD_COMMAND,
+                             AbstractResponseListener.WRITEACCESSPASSWORD_COMMAND:
+                            responseListenerDelegate?.writePasswordEvent(tagID: tagID, error: errorCode)
+
+                        default:
+                            break
+                    }
+                }
+                status = PassiveReader.READY_STATUS
+                break
+            
+            default:
+                break
+        }
+    }
+    
+    /// There has been an error sending data to device
+    ///
+    /// - parameter device: The TxRxDevice on which the error occoured
+    /// - parameter error: An NSError class instance describing the error
+    public func deviceWriteError(device: TxRxDevice, error: NSError) {
+        let errorCode = AbstractReaderListener.READER_WRITE_FAIL_ERROR
+        
+        //print("deviceWriteError")
+        switch status {
+            case PassiveReader.ERROR_STATUS,
+                PassiveReader.NOT_INITIALIZED_STATUS,
+                PassiveReader.UNINITIALIZED_STATUS:
+                    status = PassiveReader.ERROR_STATUS
+                    readerListenerDelegate?.connectionFailedEvent(error: errorCode)
+                    zhagaListenerDelegate?.connectionFailedEvent(error: errorCode)
+                
+            //case READY_STATUS:
+            
+            case PassiveReader.PENDING_COMMAND_STATUS:
+                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
+                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
+                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
+                    break;
+                }
+                
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) {
+                    //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                    //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                    resultEvent(command_code: pending, error_code: errorCode)
+                } else {
+                    switch pending {
+                        case AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND:
+                            zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
+                            
+                        case AbstractResponseListener.READ_COMMAND:
+                            responseListenerDelegate?.readEvent(tagID: tagID, error: errorCode, data: nil)
+                            
+                        case AbstractResponseListener.WRITE_COMMAND:
+                            responseListenerDelegate?.writeEvent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.LOCK_COMMAND:
+                            responseListenerDelegate?.lockEvent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.WRITEID_COMMAND:
+                            responseListenerDelegate?.writeIDevent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.READ_TID_COMMAND:
+                            responseListenerDelegate?.readTIDevent(tagID: tagID, error: errorCode, TID: nil)
+                            
+                        case AbstractResponseListener.KILL_COMMAND:
+                            responseListenerDelegate?.killEvent(tagID: tagID, error: errorCode)
+                            
+                        case AbstractResponseListener.WRITEKILLPASSWORD_COMMAND,
+                            AbstractResponseListener.WRITEACCESSPASSWORD_COMMAND:
+                            responseListenerDelegate?.writePasswordEvent(tagID: tagID, error: errorCode)
+                        
+                        default:
+                            break
+                    }
+                }
+                
+                status = PassiveReader.READY_STATUS
+            
+            default:
+                break
+        }
+    }
+    
     /// A Tertium BLE device has sent data
     ///
     /// NOTE: This can even happen PASSIVELY without issuing a command
@@ -897,8 +1067,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         var tag: Tag?
         
         // REMOVE
-        //print("receivedData()\n")
-
+        //print("receivedData()")
+        
         if (sub_status == PassiveReader.CMD_SUBSTATUS) {
             if (data.count == 0) {
                 /*
@@ -910,6 +1080,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                 resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_DRIVER_COMMAND_CMD_MODE_ANSWER_ERROR)
             } else {
                 dataString = String(data: data, encoding: .ascii)
+                //print(dataString!);
                 responseType = PassiveReader.getStringCharAt(str: dataString!, at: 0)
                 if (responseType != ">") {
                     switch (pending) {
@@ -959,12 +1130,21 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         dataString = String(data: data, encoding: .ascii)
         let splitSet = CharacterSet(arrayLiteral: "\r", "\n");
         let splitted = dataString?.components(separatedBy: splitSet)
+        //print(dataString);
         if let splitted = splitted {
             for chunk in splitted {
                 if chunk.count == 0 {
                     continue
                 }
+
+                if chunk.count >= 2 {
+                    let eventResponseCheck: String = PassiveReader.getStringSubString(str: chunk, start: 0, end: 2)
+                    if (eventResponseCheck == "> ") {
+                        return
+                    }
+                }
                 
+                //print(chunk)
                 responseType = PassiveReader.getStringCharAt(str: chunk, at: 0)
                 switch(responseType) {
                     case "Z":
@@ -993,7 +1173,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                             let char = String(chunk[String.Index(utf16Offset: n, in: chunk)])
                             let charValue = Int(char, radix: 16)
                             if (charValue == nil || charValue! < 0) {
-                                return
+                                return;
                             }
                         }
                         
@@ -1050,98 +1230,6 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                 }
             }
         }
-        
-        /*
-        dataString = String(data: data, encoding: .ascii)
-        let splitted = dataString?.components(separatedBy: "\r\n")
-        if let splitted = splitted {
-            for chunk in splitted {
-                if chunk.count == 0 {
-                    continue
-                }
-                
-                responseType = PassiveReader.getStringCharAt(str: chunk, at: 0)
-                if responseType == "> " {
-                    return
-                }
-                
-                if responseType == "$" {
-                    // Command answer
-                    answer = ReaderAnswer(answer: chunk)
-                } else if responseType == "#" || responseType == "%" {
-                    // Tunnel command answer
-                    tunnelAnswer = [UInt8](repeating: 0, count: ((chunk.count - 2) / 2))
-                    for n in 0..<tunnelAnswer!.count {
-                        tunnelAnswer![n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 + 2 * n, end: 2 + 2 * n + 2)))
-                    }
-                } else {
-                    // check for valid ID chars
-                    for n in 0..<chunk.count {
-                        let char = String(chunk[String.Index(utf16Offset: n, in: chunk)])
-                        let charValue = Int(char, radix: 16)
-                        if (charValue == nil || charValue! < 0) {
-                            return
-                        }
-                    }
-                    
-                    // Tag info
-                    if HFdevice {
-                        var ID = [UInt8](repeating: 0, count: chunk.count / 2)
-                        for n in 0..<ID.count {
-                            ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 * n, end: 2 * n + 2)))
-                        }
-                        if ID.count == 8 {
-                            tag = ISO15693_tag(ID: ID, passiveReader: self)
-                        } else {
-                            tag = ISO14443A_tag(ID: ID, passiveReader: self)
-                        }
-                        inventoryListenerDelegate?.inventoryEvent(tag: tag!)
-                    } else if UHFdevice {
-                        let separator_index = chunk.firstIndex(of: " ")
-                        if separator_index == nil {
-                            if chunk.count > 4 {
-                                var PC: UInt16
-                                
-                                PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
-                                var ID = [UInt8](repeating: 0, count: (chunk.count - 4) / 2)
-                                for n in 0..<ID.count {
-                                    ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
-                                }
-                                tag = EPC_tag(PC: PC, ID: ID, passiveReader: self)
-                                inventoryListenerDelegate?.inventoryEvent(tag: tag!)
-                            }
-                        } else {
-                            if chunk.count > 7 {
-                                var PC: UInt16
-                                var ID = [UInt8](repeating: 0, count: (chunk.count - 7) / 2)
-                                var rssi: String
-                                var tmp: Int
-                                
-                                PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
-                                for n in 0..<ID.count {
-                                    ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
-                                }
-                                rssi = PassiveReader.getStringSubString(str: chunk, start: separator_index!.utf16Offset(in: chunk) + 1, end: separator_index!.utf16Offset(in: chunk) + 1 + 2)
-                                tmp = PassiveReader.hexToWord(hex: rssi)
-                                var RSSI: Int16
-                                if tmp < 127 {
-                                    RSSI = Int16(tmp)
-                                } else {
-                                    RSSI = Int16(tmp - 256)
-                                }
-                                tag = EPC_tag(RSSI: RSSI, PC: PC, ID: ID, passiveReader: self)
-                                inventoryListenerDelegate?.inventoryEvent(tag: tag!)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        if answer == nil && tunnelAnswer == nil {
-            return
-        }
-        */
         
         switch (status) {
             case PassiveReader.ERROR_STATUS,
@@ -1767,149 +1855,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                         
                     default:
                         break
-                }            }
-        }
-    }
-
-    /// There has been an error receiving data from device
-    ///
-    /// - parameter device: The TxRxDevice on which the error occoured
-    /// - parameter error: An NSError class instance describing the error
-    public func deviceReadError(device: TxRxDevice, error: NSError) {
-        let errorCode: Int = AbstractReaderListener.READER_READ_FAIL_ERROR
-        
-        if error.code == TxRxDeviceManagerErrors.ErrorCodes.ERROR_DEVICE_RECEIVING_DATA_TIMEOUT.rawValue {
-            readTimeoutError()
-            return
-        }
-        
-        switch status {
-            case PassiveReader.ERROR_STATUS,
-                 PassiveReader.NOT_INITIALIZED_STATUS,
-                 PassiveReader.UNINITIALIZED_STATUS:
-                    status = PassiveReader.ERROR_STATUS
-                    readerListenerDelegate?.connectionFailedEvent(error: errorCode)
-                    zhagaListenerDelegate?.connectionFailedEvent(error: errorCode)
-
-            case PassiveReader.PENDING_COMMAND_STATUS:
-                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
-                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
-                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
-                    break
                 }
-                
-                if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND {
-                    //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                    //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                    resultEvent(command_code: pending, error_code: errorCode)
-                } else {
-                    switch(pending) {
-                        case AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND:
-                            zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                            
-                        case AbstractResponseListener.READ_COMMAND:
-                            responseListenerDelegate?.readEvent(tagID: tagID, error: errorCode, data: nil)
-                            
-                        case AbstractResponseListener.WRITE_COMMAND:
-                            responseListenerDelegate?.writeEvent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.LOCK_COMMAND:
-                            responseListenerDelegate?.lockEvent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.WRITEID_COMMAND:
-                            responseListenerDelegate?.writeIDevent(tagID: tagID, error: errorCode)
-
-                        case AbstractResponseListener.READ_TID_COMMAND:
-                            responseListenerDelegate?.readTIDevent(tagID: tagID, error: errorCode, TID: nil)
-
-                        case AbstractResponseListener.KILL_COMMAND:
-                            responseListenerDelegate?.killEvent(tagID: tagID, error: errorCode)
-
-                        case AbstractResponseListener.WRITEKILLPASSWORD_COMMAND,
-                             AbstractResponseListener.WRITEACCESSPASSWORD_COMMAND:
-                            responseListenerDelegate?.writePasswordEvent(tagID: tagID, error: errorCode)
-
-                        default:
-                            break
-                    }
-                }
-                status = PassiveReader.READY_STATUS
-                break
-            
-            default:
-                break
-        }
-    }
-    
-    /// There has been an error sending data to device
-    ///
-    /// - parameter device: The TxRxDevice on which the error occoured
-    /// - parameter error: An NSError class instance describing the error
-    public func deviceWriteError(device: TxRxDevice, error: NSError) {
-        let errorCode = AbstractReaderListener.READER_WRITE_FAIL_ERROR
-        
-        if error.code == TxRxDeviceManagerErrors.ErrorCodes.ERROR_DEVICE_SENDING_DATA_TIMEOUT.rawValue {
-            writeTimeoutError()
-            return
-        }
-        
-        switch status {
-            case PassiveReader.ERROR_STATUS,
-                PassiveReader.NOT_INITIALIZED_STATUS,
-                PassiveReader.UNINITIALIZED_STATUS:
-                    status = PassiveReader.ERROR_STATUS
-                    readerListenerDelegate?.connectionFailedEvent(error: errorCode)
-                    zhagaListenerDelegate?.connectionFailedEvent(error: errorCode)
-                
-            //case READY_STATUS:
-            
-            case PassiveReader.PENDING_COMMAND_STATUS:
-                if (sub_status == PassiveReader.CMD_SUBSTATUS) {
-                    sub_status = PassiveReader.SET_STREAM_SUBSTATUS
-                    deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.STREAM_MODE))
-                    break;
-                }
-                
-                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) {
-                    //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                    //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                    resultEvent(command_code: pending, error_code: errorCode)
-                } else {
-                    switch pending {
-                        case AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND:
-                            zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
-                            
-                        case AbstractResponseListener.READ_COMMAND:
-                            responseListenerDelegate?.readEvent(tagID: tagID, error: errorCode, data: nil)
-                            
-                        case AbstractResponseListener.WRITE_COMMAND:
-                            responseListenerDelegate?.writeEvent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.LOCK_COMMAND:
-                            responseListenerDelegate?.lockEvent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.WRITEID_COMMAND:
-                            responseListenerDelegate?.writeIDevent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.READ_TID_COMMAND:
-                            responseListenerDelegate?.readTIDevent(tagID: tagID, error: errorCode, TID: nil)
-                            
-                        case AbstractResponseListener.KILL_COMMAND:
-                            responseListenerDelegate?.killEvent(tagID: tagID, error: errorCode)
-                            
-                        case AbstractResponseListener.WRITEKILLPASSWORD_COMMAND,
-                            AbstractResponseListener.WRITEACCESSPASSWORD_COMMAND:
-                            responseListenerDelegate?.writePasswordEvent(tagID: tagID, error: errorCode)
-                        
-                        default:
-                            break
-                    }
-                }
-                
-                status = PassiveReader.READY_STATUS
-            
-            default:
-                break
+            }
         }
     }
 
@@ -1936,12 +1883,14 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         pending = AbstractReaderListener.GET_SECURITY_LEVEL_COMMAND
         if (deviceManager.isTxRxAckme(device: connectedDevice!)) {
             sub_status = PassiveReader.SET_CMD_SUBSTATUS
-            command = "get bl e e"
+            cmdModeCommand = "get bl e e"
             deviceManager.setMode(device: connectedDevice!, mode: UInt(PassiveReader.CMD_MODE))
         } else {
             let parameters = [UInt8(PassiveReader.BLE_SECURITY_LEVEL)]
             deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.BLE_CONFIG_COMMAND, parameters: parameters).data(using: String.Encoding.ascii)!)
         }
+        
+        //print("Pending command")
     }
     
     class ReaderAnswer {
