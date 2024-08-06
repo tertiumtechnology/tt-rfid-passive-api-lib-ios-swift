@@ -87,8 +87,8 @@ public class EPC_tag: Tag {
     /// EPC tag access password unreadable/unwritable lock code.
     public static let ACCESSPASSWORD_UNREADABLE_UNWRITABLE: Int = 0x300C0F	
 	
-    private let PC: UInt16
-    private let RSSI: Int16
+    internal var PC: UInt16
+    internal var RSSI: Int16
 	
 	/// Class Constructor
 	///
@@ -306,7 +306,6 @@ public class EPC_tag: Tag {
     ///
     /// - parameter address - the tag memory address
     /// - parameter blocks - the number of memory 2-bytes blocks to read (1-50)
-    /// - parameter password - tag access password (may be null or empty)
     public func read(address: Int, blocks: Int) {
         var memoryToRead = [UInt8](repeating: 0, count: 3)
         var pcNumber = [UInt8](repeating: 0, count: 3)
@@ -481,6 +480,5 @@ public class EPC_tag: Tag {
 		}
 		
 		return tmp
-    }	
-
+    }
 }

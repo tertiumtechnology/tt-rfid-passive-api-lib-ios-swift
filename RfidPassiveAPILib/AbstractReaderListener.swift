@@ -351,6 +351,11 @@ public class AbstractReaderListener
      */
     public static let ZHAGA_TRANSPARENT_COMMAND: Int = 81
     
+    /**
+     * {@link PassiveReader#setInventoryFormat(int) setInventoryFormat} command.
+     */
+    public static let SET_INVENTORY_FORMAT_COMMAND: Int = 82
+    
     /// Successful command code (no error).
     static let NO_ERROR: Int = 0x00
     

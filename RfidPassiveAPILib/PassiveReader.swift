@@ -249,10 +249,10 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
     static private let ID_ONLY_FORMAT:Int = 0x01
     
     /// Inventory operation get EPC tag ID only.
-    static private let EPC_ONLY_FORMAT:Int = 0x01
+    static public let EPC_ONLY_FORMAT:Int = 0x01
     
     /// Inventory operation get ECP tag ID and PC (Protocol Code).
-    static private let EPC_AND_PC_FORMAT:Int = 0x03
+    static public let EPC_AND_PC_FORMAT:Int = 0x03
     
     /// Inventory operation get EPC tag ID e TID (tag unique ID).
     static private let EPC_AND_TID_FORMAT:Int = 0x05
@@ -447,7 +447,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         //deviceManager._delegate = self
         sequential = 0
         inventoryEnabled = false
-        inventoryMode = PassiveReader.NORMAL_MODE
+        inventoryMode = PassiveReader.SCAN_ON_INPUT_MODE
         sub_status = PassiveReader.STREAM_SUBSTATUS
     }
     
@@ -805,7 +805,6 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     zhagaListenerDelegate?.connectionFailedEvent(error: AbstractResponseListener.READER_WRITE_TIMEOUT_ERROR)
             
             //case READY_STATUS:
-            
             case PassiveReader.PENDING_COMMAND_STATUS:
                 if (sub_status == PassiveReader.CMD_SUBSTATUS) {
                     sub_status = PassiveReader.SET_STREAM_SUBSTATUS
@@ -813,7 +812,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     break;
                 }
                 
-                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) {
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                    pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                     //readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_WRITE_TIMEOUT_ERROR)
                     //zhagaListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_WRITE_TIMEOUT_ERROR)
                     resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_WRITE_TIMEOUT_ERROR)
@@ -876,7 +876,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     break
                 }
                 
-                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) {
+            if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                     //readerListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_READ_TIMEOUT_ERROR)
                     //zhagaListenerDelegate?.resultEvent(command: pending, error: AbstractReaderListener.READER_READ_TIMEOUT_ERROR)
                     resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_READ_TIMEOUT_ERROR)
@@ -942,7 +943,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     break
                 }
                 
-                if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND {
+                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                    pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                     //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
                     //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
                     resultEvent(command_code: pending, error_code: errorCode)
@@ -1010,7 +1012,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                     break;
                 }
                 
-                if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) {
+            if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                     //readerListenerDelegate?.resultEvent(command: pending, error: errorCode)
                     //zhagaListenerDelegate?.resultEvent(command: pending, error: errorCode)
                     resultEvent(command_code: pending, error_code: errorCode)
@@ -1156,7 +1159,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                             pending == AbstractResponseListener.READ_TID_COMMAND) {
                             answer = ReaderAnswer(answer: chunk, bugfix: true)
                         } else {
-                            answer = ReaderAnswer(answer: chunk, bugfix: true)
+                            answer = ReaderAnswer(answer: chunk, bugfix: false)
                         }
                         break
                         
@@ -1195,25 +1198,42 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                                 if chunk.count > 4 {
                                     var PC: UInt16
                                     
-                                    PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
-                                    var ID = [UInt8](repeating: 0, count: (chunk.count - 4) / 2)
-                                    for n in 0..<ID.count {
-                                        ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                                    if inventoryFormat == PassiveReader.EPC_AND_PC_FORMAT {
+                                        PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
+                                        var ID = [UInt8](repeating: 0, count: (chunk.count - 4) / 2)
+                                        for n in 0..<ID.count {
+                                            ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                                        }
+                                        tag = EPC_tag(PC: PC, ID: ID, passiveReader: self)
+                                    } else {
+                                        // EPC ONLY FORMAT
+                                        var ID = [UInt8](repeating: 0, count: chunk.count / 2)
+                                         for n in 0..<ID.count {
+                                             ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 * n, end: 2 * n + 2)))
+                                         }
+                                        tag = EPC_simple_tag(RSSI: -128, ID: ID, passiveReader: self)
                                     }
-                                    tag = EPC_tag(PC: PC, ID: ID, passiveReader: self)
                                     inventoryListenerDelegate?.inventoryEvent(tag: tag!)
                                 }
                             } else {
                                 if chunk.count > 7 {
-                                    var PC: UInt16
-                                    var ID = [UInt8](repeating: 0, count: (chunk.count - 7) / 2)
+                                    var PC: UInt16 = 0
+                                    var ID: [UInt8]
+                                    if inventoryFormat == PassiveReader.EPC_AND_PC_FORMAT {
+                                        ID = [UInt8](repeating: 0, count: (chunk.count - 7) / 2)
+                                        PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
+                                        for n in 0..<ID.count {
+                                            ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
+                                        }
+                                    } else {
+                                        ID = [UInt8](repeating: 0, count: chunk.count / 2)
+                                        for n in 0..<ID.count {
+                                            ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 2 * n, end: 2 * n + 2)))
+                                        }
+                                    }
                                     var rssi: String
                                     var tmp: Int
                                     
-                                    PC = UInt16(PassiveReader.hexToWord(hex: PassiveReader.getStringSubString(str: chunk, start: 0, end: 4)))
-                                    for n in 0..<ID.count {
-                                        ID[n] = UInt8(PassiveReader.hexToByte(hex: PassiveReader.getStringSubString(str: chunk, start: 4 + 2 * n, end: 4 + 2 * n + 2)))
-                                    }
                                     rssi = PassiveReader.getStringSubString(str: chunk, start: separator_index!.utf16Offset(in: chunk) + 1, end: separator_index!.utf16Offset(in: chunk) + 1 + 2)
                                     tmp = PassiveReader.hexToWord(hex: rssi)
                                     var RSSI: Int16
@@ -1222,7 +1242,13 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                                     } else {
                                         RSSI = Int16(tmp - 256)
                                     }
-                                    tag = EPC_tag(RSSI: RSSI, PC: PC, ID: ID, passiveReader: self)
+                                    
+                                    if inventoryFormat == PassiveReader.EPC_AND_PC_FORMAT {
+                                        tag = EPC_tag(RSSI: RSSI, PC: PC, ID: ID, passiveReader: self)
+                                    } else {
+                                        // EPC_ONLY_FORMAT
+                                        tag = EPC_simple_tag(RSSI: RSSI, ID: ID, passiveReader: self)
+                                    }
                                     inventoryListenerDelegate?.inventoryEvent(tag: tag!)
                                 }
                             }
@@ -1291,7 +1317,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                 if answer != nil && answer!.getSequential() == (sequential==0 ? 255 : sequential-1) {
                     if answer!.getReturnCode() != PassiveReader.SUCCESSFUL_OPERATION_RETCODE && pending != AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND {
                         status = PassiveReader.READY_STATUS
-                        if pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND {
+                        if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractZhagaListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                            pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                             //readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                             //zhagaListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                             resultEvent(command_code: pending, error_code: answer!.getReturnCode())
@@ -1364,6 +1391,12 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                              AbstractReaderListener.SET_SECURITY_LEVEL_COMMAND,
                              AbstractReaderListener.SET_DEVICE_NAME_COMMAND:
                             resultEvent(command_code: pending, error_code: answer!.getReturnCode())
+                        
+                        case AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND:
+                            if answer!.getReturnCode() == AbstractReaderListener.NO_ERROR {
+                                inventoryFormat = format
+                            }
+                            readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                             
                         case AbstractReaderListener.DEFAULT_SETUP_COMMAND:
                             inventoryStandard = PassiveReader.ISO15693_STANDARD
@@ -1373,10 +1406,11 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                             resultEvent(command_code: pending, error_code: answer!.getReturnCode())
 
                         case AbstractReaderListener.SET_INVENTORY_MODE_COMMAND:
+                            /*
                             if answer!.getReturnCode() == AbstractReaderListener.NO_ERROR {
                                 inventoryMode = mode
                             }
-                            
+                            */                            
                             readerListenerDelegate?.resultEvent(command: pending, error: answer!.getReturnCode())
                         
                         case AbstractReaderListener.SET_INVENTORY_TYPE_COMMAND:
@@ -1392,8 +1426,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                                 inventoryFeedback = feedback
                                 inventoryFormat = format
                                 inventoryMaxNumber = maxNumber
-                                inventoryInterval = interval
-                                inventoryTimeout = timeout
+                                inventoryInterval = interval / 100
+                                inventoryTimeout = timeout / 100
                                 inventoryEnabled = true
                             }
                         
@@ -1768,7 +1802,9 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
                         readerListenerDelegate?.tunnelEvent(data: tunnelAnswer)
                     } else {
                         // answer mismatch
-                        if (pending >= AbstractReaderListener.SOUND_COMMAND && pending <= AbstractReaderListener.SET_INVENTORY_TYPE_COMMAND) {
+                        if (pending >= AbstractReaderListener.SOUND_COMMAND &&
+                            pending <= AbstractReaderListener.ZHAGA_TRANSPARENT_COMMAND) ||
+                            pending == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND {
                             resultEvent(command_code: pending, error_code: AbstractReaderListener.READER_DRIVER_COMMAND_ANSWER_MISMATCH_ERROR);
                         } else {
                             switch (pending) {
@@ -3675,6 +3711,45 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.ISO15693_SETREGISTER_COMMAND, parameters: data).data(using: String.Encoding.ascii)!)
     }
     
+    ///
+    /// Set the inventory response format for the UHF reader device.
+    ///
+    /// Response to the command received via {@link
+    /// AbstractReaderListener#resultEvent(int, int) resultEvent} method
+    /// invocation.
+    ///
+    /// - parameter format - the inventory response format
+    public func setInventoryFormat(format: Int)
+    {
+        var data = [UInt8](repeating: 0, count: 6)
+        if status != PassiveReader.READY_STATUS {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_INVENTORY_MODE_COMMAND, error: AbstractReaderListener.READER_DRIVER_WRONG_STATUS_ERROR)
+            return
+        }
+        
+        if isHF() {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND, error: AbstractReaderListener.READER_DRIVER_UNKNOW_COMMAND_ERROR)
+            return
+        }
+        
+        if format != PassiveReader.EPC_AND_PC_FORMAT && format != PassiveReader.EPC_ONLY_FORMAT {
+            readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND, error: AbstractReaderListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
+            return
+        }
+        
+        self.format = format
+        status = PassiveReader.PENDING_COMMAND_STATUS
+        pending = AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND
+        
+        data[0] = UInt8(mode)
+        data[1] = UInt8(feedback)
+        data[2] = UInt8(format)
+        data[3] = UInt8(maxNumber)
+        data[4] = UInt8(timeout / 100)
+        data[5] = UInt8(interval / 100)
+        deviceManager.sendData(device: connectedDevice!, data: buildCommand(commandCode: PassiveReader.SETMODE_COMMAND, parameters: data).data(using: String.Encoding.ascii)!)
+    }
+    
     /// Set the inventory operating mode for the reader device.
     /// 
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
@@ -3707,8 +3782,8 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
     /// Response to the command received via AbstractReaderListener.resultEvent(Int, Int) method invocation.
 	///
     /// - parameter feedback - the reader device local feedback for detected tag(s)
-    /// - parameter timeout  - the inventory scan time (milliseconds: 100-2000)
-    /// - parameter interval - the inventory repetition period (milliseconds: 100-25500)   
+    /// - parameter timeout  - the inventory scan time (milliseconds: 100-25500)
+    /// - parameter interval - the inventory repetition period (milliseconds: 100-25500)
     public func setInventoryParameters(feedback: Int, timeout: Int, interval: Int) {
         var data = [UInt8](repeating: 0, count: 6)
 
@@ -3722,7 +3797,7 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
             return
         }
         
-        if timeout < 100 || timeout > 2000 {
+        if timeout < 100 || timeout > 25500 {
             readerListenerDelegate?.resultEvent(command: AbstractReaderListener.SET_INVENTORY_PARAMETERS_COMMAND, error: AbstractReaderListener.READER_DRIVER_COMMAND_WRONG_PARAMETER_ERROR)
             return
         }
@@ -3736,12 +3811,13 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
         if isHF() {
             format = PassiveReader.ID_ONLY_FORMAT
         } else {
-            format = PassiveReader.EPC_AND_PC_FORMAT
+            format = PassiveReader.EPC_ONLY_FORMAT
         }
         
         maxNumber = 0
-        self.timeout = timeout / 100
-        self.interval = interval / 100
+        mode = PassiveReader.SCAN_ON_INPUT_MODE
+        self.timeout = timeout
+        self.interval = interval
         
         data[0] = UInt8(mode)
         data[1] = UInt8(feedback)
@@ -4002,8 +4078,9 @@ public class PassiveReader: TxRxDeviceDataProtocol, ZhagaReaderProtocol {
             zhagaListenerDelegate?.resultEvent(command: command_code, error: error_code)
             return
         }
-        if (command_code >= AbstractReaderListener.SET_ADVERTISING_INTERVAL_COMMAND &&
-            command_code < AbstractReaderListener.RESET_COMMAND) {
+        if ((command_code >= AbstractReaderListener.SET_ADVERTISING_INTERVAL_COMMAND &&
+            command_code < AbstractReaderListener.RESET_COMMAND) ||
+            command_code == AbstractReaderListener.SET_INVENTORY_FORMAT_COMMAND) {
             readerListenerDelegate?.resultEvent(command: command_code, error: error_code)
             return
         }
